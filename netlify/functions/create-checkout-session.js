@@ -1,10 +1,9 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { NetlifyJwtVerifier } = require('@serverless-jwt/netlify');
 
-const verifyJwt = NetlifyJwtVerifier({
-  issuer: `https://api.netlify.com/`,
-  audience: 'https://api.netlify.com'
-});
+// CORREÇÃO: Removemos a configuração com o endereço errado.
+// A função agora usará os valores padrão corretos.
+const verifyJwt = NetlifyJwtVerifier();
 
 exports.handler = verifyJwt(async (event, context) => {
   try {
@@ -18,7 +17,6 @@ exports.handler = verifyJwt(async (event, context) => {
       };
     }
 
-    // Recebe o ID do preço e o modo (subscription ou payment) do front-end
     const { priceId, mode } = JSON.parse(event.body);
 
     if (!priceId || !mode) {
@@ -28,7 +26,6 @@ exports.handler = verifyJwt(async (event, context) => {
         };
     }
 
-    // Valida o modo para segurança extra
     if (mode !== 'subscription' && mode !== 'payment') {
         return {
             statusCode: 400,
@@ -38,16 +35,11 @@ exports.handler = verifyJwt(async (event, context) => {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId, // Usa o ID do preço recebido do cliente
-          quantity: 1,
-        },
-      ],
-      mode: mode, // Usa o modo (subscription ou payment) recebido do cliente
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: mode,
       success_url: `${process.env.SITE_URL}/calculadora.html`,
       cancel_url: `${process.env.SITE_URL}/calculadora.html`,
-      client_reference_id: user.sub, // ID do utilizador Netlify
+      client_reference_id: user.sub,
     });
 
     return {
