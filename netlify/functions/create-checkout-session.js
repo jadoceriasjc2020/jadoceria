@@ -1,36 +1,17 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { NetlifyJwtVerifier } = require('@serverless-jwt/netlify');
 
-// Configuração do verificador JWT
-const verifyJwt = NetlifyJwtVerifier({
-  issuer: process.env.URL ? new URL(process.env.URL).origin : 'https://calculadorapro2025.netlify.app',
-  audience: process.env.SITE_ID || 'calculadorapro2025.netlify.app'
-});
-
+// Não precisamos mais da biblioteca JWT. A Netlify já nos dá o utilizador!
 
 exports.handler = async (event, context) => {
   try {
-    // CORREÇÃO: Extração manual e verificação explícita do token de autorização
-    const authHeader = event.headers.authorization;
-    if (!authHeader) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Cabeçalho de autorização em falta. Tente atualizar a página.' }) };
-    }
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Token de autorização malformado.' }) };
-    }
+    // ABORDAGEM SIMPLIFICADA: Pegar o utilizador diretamente do contexto da Netlify
+    const { user } = context.clientContext;
 
-    const claims = await verifyJwt(token); // Verificamos o token diretamente
-
-    // PASSO DE DEBUG: Vamos ver o que está dentro do "passaporte"
-    console.log('Claims recebidas:', JSON.stringify(claims));
-
-    const user = claims.user;
-
+    // Se não houver utilizador no contexto, significa que a pessoa não está logada.
     if (!user || !user.sub) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: 'Utilizador não autenticado.' }),
+        body: JSON.stringify({ error: 'Utilizador não autenticado. Por favor, faça login novamente.' }),
       };
     }
     
@@ -55,9 +36,9 @@ exports.handler = async (event, context) => {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: mode,
-      // CORREÇÃO: Corrigido o erro de digitação no URL de sucesso
       success_url: `${process.env.SITE_URL}/calculadora.html`,
       cancel_url: `${process.env.SITE_URL}/calculadora.html`,
+      // Usamos o ID do utilizador que a Netlify nos deu
       client_reference_id: user.sub,
     });
 
