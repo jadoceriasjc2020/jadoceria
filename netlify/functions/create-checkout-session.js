@@ -1,16 +1,18 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { NetlifyJwtVerifier } = require('@serverless-jwt/netlify');
 
-// CORREÇÃO FINAL: Especificamos explicitamente qual é o "emissor" dos JWTs,
-// usando a variável de ambiente SITE_URL que já configurámos.
+// Configuração do verificador JWT
 const verifyJwt = NetlifyJwtVerifier({
-  issuer: `${process.env.SITE_URL}/.netlify/identity`
+  issuer: process.env.URL ? new URL(process.env.URL).origin : 'https://calculadorapro2025.netlify.app',
+  audience: process.env.SITE_ID || 'calculadorapro2025.netlify.app'
 });
 
-exports.handler = verifyJwt(async (event, context) => {
+
+exports.handler = async (event, context) => {
+  // Verificação de segurança como primeiro passo dentro da função
   try {
-    const { claims } = context.identityContext;
-    const { user } = claims;
+    const claims = await verifyJwt(event);
+    const user = claims.user;
 
     if (!user || !user.sub) {
       return {
@@ -18,7 +20,8 @@ exports.handler = verifyJwt(async (event, context) => {
         body: JSON.stringify({ error: 'Utilizador não autenticado.' }),
       };
     }
-
+    
+    // O resto do código continua igual
     const { priceId, mode } = JSON.parse(event.body);
 
     if (!priceId || !mode) {
@@ -39,7 +42,7 @@ exports.handler = verifyJwt(async (event, context) => {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: mode,
-      success_url: `${process.env.SITE_URL}/calculadora.html`,
+      success_url: `${process.env.SITE_URL}/calculadoradora.html`,
       cancel_url: `${process.env.SITE_URL}/calculadora.html`,
       client_reference_id: user.sub,
     });
@@ -48,18 +51,16 @@ exports.handler = verifyJwt(async (event, context) => {
       statusCode: 200,
       body: JSON.stringify({ redirect_url: session.url }),
     };
-  } catch (error)
-   {
-    // Adicionamos mais detalhes no log para facilitar a depuração
+
+  } catch (error) {
     console.error('Erro na função de checkout:', {
         message: error.message,
         stack: error.stack,
-        event: event, // Loga o evento recebido
     });
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Não foi possível criar a sessão de checkout. Verifique os logs da função.' }),
+      body: JSON.stringify({ error: `Falha ao criar a sessão de pagamento. (${error.message})` }),
     };
   }
-});
+};
 
