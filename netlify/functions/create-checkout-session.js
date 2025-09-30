@@ -21,6 +21,10 @@ exports.handler = async (event, context) => {
     }
 
     const claims = await verifyJwt(token); // Verificamos o token diretamente
+
+    // PASSO DE DEBUG: Vamos ver o que está dentro do "passaporte"
+    console.log('Claims recebidas:', JSON.stringify(claims));
+
     const user = claims.user;
 
     if (!user || !user.sub) {
