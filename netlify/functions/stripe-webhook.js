@@ -10,6 +10,11 @@ const updateUserRole = async (userId, action) => {
   const url = `https://api.netlify.com/api/v1/sites/${siteId}/users/${userId}`;
 
   if (!adminToken || !siteId) {
+    // Adiciona um log detalhado para sabermos exatamente o que está em falta
+    console.error('ERRO CRÍTICO: Variáveis de ambiente em falta.', {
+      hasAdminToken: !!adminToken,
+      hasSiteId: !!siteId
+    });
     throw new Error('As variáveis NETLIFY_ADMIN_AUTH_TOKEN e NETLIFY_SITE_ID são obrigatórias.');
   }
 
@@ -32,6 +37,8 @@ const updateUserRole = async (userId, action) => {
 
   if (!response.ok) {
     const errorData = await response.text();
+    // Log do erro completo para depuração
+    console.error('Resposta de erro da API da Netlify:', errorData);
     throw new Error(`Falha ao atualizar o utilizador na Netlify: Status ${response.status} - ${errorData}`);
   }
 
@@ -54,6 +61,8 @@ exports.handler = async ({ body, headers }) => {
       if (netlifyUserId) {
         await updateUserRole(netlifyUserId, 'add');
         console.log(`Acesso premium concedido ao utilizador: ${netlifyUserId}`);
+      } else {
+        console.error('ERRO: checkout.session.completed recebido sem client_reference_id.');
       }
     }
 
