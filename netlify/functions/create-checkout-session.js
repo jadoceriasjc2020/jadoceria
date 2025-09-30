@@ -1,9 +1,11 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { NetlifyJwtVerifier } = require('@serverless-jwt/netlify');
 
-// CORREÇÃO: Removemos a configuração com o endereço errado.
-// A função agora usará os valores padrão corretos.
-const verifyJwt = NetlifyJwtVerifier();
+// CORREÇÃO FINAL: Especificamos explicitamente qual é o "emissor" dos JWTs,
+// usando a variável de ambiente SITE_URL que já configurámos.
+const verifyJwt = NetlifyJwtVerifier({
+  issuer: `${process.env.SITE_URL}/.netlify/identity`
+});
 
 exports.handler = verifyJwt(async (event, context) => {
   try {
@@ -46,11 +48,17 @@ exports.handler = verifyJwt(async (event, context) => {
       statusCode: 200,
       body: JSON.stringify({ redirect_url: session.url }),
     };
-  } catch (error) {
-    console.error('Erro na função de checkout:', error);
+  } catch (error)
+   {
+    // Adicionamos mais detalhes no log para facilitar a depuração
+    console.error('Erro na função de checkout:', {
+        message: error.message,
+        stack: error.stack,
+        event: event, // Loga o evento recebido
+    });
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Não foi possível criar a sessão de checkout.' }),
+      body: JSON.stringify({ error: 'Não foi possível criar a sessão de checkout. Verifique os logs da função.' }),
     };
   }
 });
