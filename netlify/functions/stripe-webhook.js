@@ -3,18 +3,20 @@ const fetch = require('node-fetch');
 
 // Função para atualizar o papel (role) do utilizador na Netlify
 const updateUserRole = async (userId, action) => {
-  const url = `https://api.netlify.com/api/v1/admin/users/${userId}`;
+  // CORREÇÃO FINAL: Este é o URL correto para a API interna da Netlify
+  const url = `${process.env.URL}/.netlify/identity/admin/users/${userId}`;
   const adminToken = process.env.NETLIFY_ADMIN_AUTH_TOKEN;
 
   if (!adminToken) {
     throw new Error('Token de admin da Netlify não configurado.');
   }
 
-  const currentRoles = action === 'add' ? ['premium'] : [];
+  // Define os papéis (roles) a serem aplicados. Se for 'remove', o array fica vazio.
+  const roles = action === 'add' ? ['premium'] : [];
 
   const body = {
     app_metadata: {
-      roles: currentRoles,
+      roles: roles,
     },
   };
 
@@ -28,8 +30,9 @@ const updateUserRole = async (userId, action) => {
   });
 
   if (!response.ok) {
+    // Melhoramos a mensagem de erro para nos dar mais detalhes
     const errorData = await response.text();
-    throw new Error(`Falha ao atualizar o utilizador na Netlify: ${errorData}`);
+    throw new Error(`Falha ao atualizar o utilizador na Netlify: Status ${response.status} - ${errorData}`);
   }
 
   return response.json();
@@ -58,9 +61,11 @@ exports.handler = async ({ body, headers }) => {
     // Lida com o evento de cancelamento/fim de assinatura
     if (stripeEvent.type === 'customer.subscription.deleted') {
       const subscription = stripeEvent.data.object;
-      // Para revogar o acesso, seria necessário encontrar o netlifyUserId associado a esta subscrição
-      // e chamar updateUserRole(netlifyUserId, 'remove');
-      console.log(`Assinatura cancelada: ${subscription.id}`);
+      // Para revogar o acesso, precisaríamos do ID do utilizador da Netlify.
+      // O Stripe não nos dá isso diretamente aqui, mas poderíamos encontrá-lo
+      // a partir do `subscription.customer` (ID do cliente no Stripe).
+      // Por agora, vamos apenas registar o evento.
+      console.log(`Assinatura cancelada: ${subscription.id}. Acesso a ser revogado manualmente por enquanto.`);
     }
 
     return {
