@@ -6,38 +6,31 @@ const updateUserRole = async (userId, action) => {
   const siteId = process.env.NETLIFY_SITE_ID;
   const adminToken = process.env.NETLIFY_ADMIN_AUTH_TOKEN;
 
-  // Este é o URL correto da API PÚBLICA da Netlify para atualizar um utilizador
+  // --- NOSSO RAIO-X FINAL ---
+  console.log('--- DADOS PARA ATUALIZAÇÃO DO UTILIZADOR ---');
+  console.log(`SITE ID A SER USADO: ${siteId}`);
+  console.log(`USER ID A SER ATUALIZADO: ${userId}`);
+  console.log(`TOKEN ADMIN USADO (primeiros 4 chars): ${adminToken ? adminToken.substring(0, 4) : 'NÃO ENCONTRADO'}`);
+  // -------------------------
+
   const url = `https://api.netlify.com/api/v1/sites/${siteId}/users/${userId}`;
 
   if (!adminToken || !siteId) {
-    // Adiciona um log detalhado para sabermos exatamente o que está em falta
-    console.error('ERRO CRÍTICO: Variáveis de ambiente em falta.', {
-      hasAdminToken: !!adminToken,
-      hasSiteId: !!siteId
-    });
+    console.error('ERRO CRÍTICO: Variáveis de ambiente em falta.', { hasAdminToken: !!adminToken, hasSiteId: !!siteId });
     throw new Error('As variáveis NETLIFY_ADMIN_AUTH_TOKEN e NETLIFY_SITE_ID são obrigatórias.');
   }
 
   const roles = action === 'add' ? ['premium'] : [];
-
-  const body = {
-    app_metadata: {
-      roles: roles,
-    },
-  };
+  const body = { app_metadata: { roles: roles } };
 
   const response = await fetch(url, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${adminToken}`,
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
 
   if (!response.ok) {
     const errorData = await response.text();
-    // Log do erro completo para depuração
     console.error('Resposta de erro da API da Netlify:', errorData);
     throw new Error(`Falha ao atualizar o utilizador na Netlify: Status ${response.status} - ${errorData}`);
   }
