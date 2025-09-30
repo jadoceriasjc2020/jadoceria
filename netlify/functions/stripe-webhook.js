@@ -3,14 +3,14 @@ const fetch = require('node-fetch');
 
 // Função para atualizar o papel (role) do utilizador na Netlify
 const updateUserRole = async (userId, action) => {
-  const url = `${process.env.URL}/.netlify/identity/admin/users/${userId}`;
+  const siteId = process.env.NETLIFY_SITE_ID;
   const adminToken = process.env.NETLIFY_ADMIN_AUTH_TOKEN;
 
-  // LINHA DE DEBUG: Vamos verificar como a função está a ver o token.
-  console.log(`DEBUG: Verificando o token. Comprimento: ${adminToken ? adminToken.length : 'N/A'}. Primeiros 4 chars: ${adminToken ? adminToken.substring(0, 4) : 'N/A'}`);
+  // Este é o URL correto da API PÚBLICA da Netlify para atualizar um utilizador
+  const url = `https://api.netlify.com/api/v1/sites/${siteId}/users/${userId}`;
 
-  if (!adminToken) {
-    throw new Error('Token de admin da Netlify não configurado.');
+  if (!adminToken || !siteId) {
+    throw new Error('As variáveis NETLIFY_ADMIN_AUTH_TOKEN e NETLIFY_SITE_ID são obrigatórias.');
   }
 
   const roles = action === 'add' ? ['premium'] : [];
