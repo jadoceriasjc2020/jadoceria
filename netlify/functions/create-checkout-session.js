@@ -9,9 +9,18 @@ const verifyJwt = NetlifyJwtVerifier({
 
 
 exports.handler = async (event, context) => {
-  // Verificação de segurança como primeiro passo dentro da função
   try {
-    const claims = await verifyJwt(event);
+    // CORREÇÃO: Extração manual e verificação explícita do token de autorização
+    const authHeader = event.headers.authorization;
+    if (!authHeader) {
+      return { statusCode: 401, body: JSON.stringify({ error: 'Cabeçalho de autorização em falta. Tente atualizar a página.' }) };
+    }
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return { statusCode: 401, body: JSON.stringify({ error: 'Token de autorização malformado.' }) };
+    }
+
+    const claims = await verifyJwt(token); // Verificamos o token diretamente
     const user = claims.user;
 
     if (!user || !user.sub) {
@@ -42,7 +51,8 @@ exports.handler = async (event, context) => {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: mode,
-      success_url: `${process.env.SITE_URL}/calculadoradora.html`,
+      // CORREÇÃO: Corrigido o erro de digitação no URL de sucesso
+      success_url: `${process.env.SITE_URL}/calculadora.html`,
       cancel_url: `${process.env.SITE_URL}/calculadora.html`,
       client_reference_id: user.sub,
     });
