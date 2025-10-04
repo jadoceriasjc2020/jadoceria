@@ -1,427 +1,266 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Precificação Profissional</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        [data-netlify-identity-menu] { display: none !important; }
-        div.modal-container { border-radius: 1rem !important; }
-        .modal-content { padding: 2rem !important; }
-        .modal-header, .form-header { font-family: 'Inter', sans-serif !important; color: #1F2937 !important; }
-        .modal input[type="email"], .modal input[type="password"] { width: 100% !important; padding: 0.75rem !important; border: 1px solid #D1D5DB !important; border-radius: 0.5rem !important; margin-top: 0.5rem !important; transition: border-color 0.2s, box-shadow 0.2s !important; }
-        .modal input[type="email"]:focus, .modal input[type="password"]:focus { border-color: #F97316 !important; box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3) !important; outline: none !important; }
-        .modal .btn { width: 100% !important; background-color: #F97316 !important; color: white !important; font-weight: bold !important; padding: 0.75rem !important; border-radius: 0.5rem !important; margin-top: 1rem !important; }
-        .modal .btn:hover { background-color: #EA580C !important; }
-        .input-price { text-align: right; }
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        .btn { transition: all 0.2s ease-in-out; }
-        .btn:hover { transform: translateY(-2px); }
-        .status-bar { transition: all 0.3s ease-in-out; }
-        .recipe-details { transition: max-height 0.5s ease-in-out; overflow: hidden; }
-        body.light { background-color: #F3F4F6; color: #1F2937; }
-        .light .card { background-color: #FFFFFF; }
-        .light .card-header, .light .section-header { color: #1F2937; }
-        .light .card-subheader { color: #4B5563; }
-        .light .input-bg { background-color: #F9FAFB; }
-        .light .input-text { color: #1F2937; }
-        .light .input-yellow { background-color: #F3F4F6; color: #1F2937; } 
-        .light .border-color { border-color: #E5E7EB; }
-        .light .calculated { background-color: #E5E7EB; color: #1F2937;}
-        html.dark body, body.dark { background-color: #111827; color: #D1D5DB; }
-        html.dark .card, .dark .card { background-color: #1F2937; }
-        html.dark .card-header, .dark .card-header, html.dark .section-header, .dark .section-header { color: #FFFFFF; }
-        html.dark .card-subheader, .dark .card-subheader { color: #9CA3AF; }
-        html.dark .input-bg, .dark .input-bg { background-color: #374151; }
-        html.dark .input-text, .dark .input-text { color: #F9FAFB; }
-        html.dark .input-yellow, .dark .input-yellow { background-color: #374151; color: #F9FAFB; } 
-        html.dark .border-color, .dark .border-color { border-color: #4B5563; }
-        html.dark .calculated, .dark .calculated { background-color: #4B5563; color: #F9FAFB;}
-        .summary-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--tw-border-color); }
-        .summary-compact .price-display { display: flex; flex-direction: column; align-items: center; padding: 0.5rem; border-radius: 0.5rem; font-size: 0.8rem; }
-        .bg-green-100 { background-color: #D1FAE5; } .bg-green-100\/50 { background-color: rgba(209, 250, 229, 0.5); } .text-green-800 { color: #065F46; } .text-green-700 { color: #065F46; } .dark .bg-green-900\/50 { background-color: rgba(4, 120, 87, 0.5); } .dark .text-green-300 { color: #A7F3D0; } .dark .text-green-400 { color: #6EE7B7; }
-        .bg-red-100 { background-color: #FEE2E2; } .bg-red-100\/50 { background-color: rgba(254, 226, 226, 0.5); } .text-red-800 { color: #991B1B; } .text-red-700 { color: #991B1B; } .dark .bg-red-900\/50 { background-color: rgba(153, 27, 27, 0.5); } .dark .text-red-300 { color: #FCA5A5; } .dark .text-red-400 { color: #F87171; }
-        .price-shadow-effect, .summary-expanded p[id^="direct-price-"], .summary-expanded p[id^="ifood-price-"] { font-weight: 900; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
-        html.dark .summary-expanded p[id^="direct-price-"], html.dark .summary-expanded p[id^="ifood-price-"], html.dark .summary-compact span[id^="direct-price-compact-"], html.dark .summary-compact span[id^="ifood-price-compact-"] { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4); }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora — Dinheiro na Internet</title>
+  <style>
+    body { font-family: Inter, system-ui, Arial; margin: 0; padding: 20px; background:#f7f7f8; color:#222; }
+    header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .brand { font-weight:700; font-size:18px; }
+    .card { background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 18px rgba(30,30,30,0.06); margin-bottom:16px; }
+    .hidden { display:none; }
+    .plans { display:flex; gap:12px; flex-wrap:wrap; }
+    .plan { flex:1 1 220px; padding:14px; border-radius:8px; border:1px solid #e6e6e9; text-align:center; }
+    .plan h3 { margin:0 0 8px 0; }
+    button { background:#111; color:white; border:0; padding:10px 14px; border-radius:6px; cursor:pointer; }
+    .secondary { background:#f0f0f3; color:#111; }
+    #paymentStatus { margin-top:10px; color:#b00; }
+    .top-actions { display:flex; gap:8px; align-items:center; }
+    .small { font-size:13px; color:#666; }
+    label { display:block; margin:8px 0 4px; font-weight:600; }
+    input[type=number] { width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; }
+  </style>
+  <!-- Netlify Identity widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
-<body class="p-4 md:p-8 dark">
-
-    <!-- Container para a tela de assinatura (para não-membros) -->
-    <div id="subscription-prompt" class="hidden">
-        <div class="min-h-screen flex items-center justify-center">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl mx-auto p-8 md:p-12 text-center">
-                <h1 class="text-3xl md:text-4xl font-extrabold text-orange-600 dark:text-orange-500">Escolha o seu Plano Premium</h1>
-                <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">
-                    Desbloqueie a <span class="font-bold">Calculadora de Precificação Profissional</span> e tenha controlo total sobre os seus lucros.
-                </p>
-                
-                <!-- Secção de Planos -->
-                <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Plano Mensal -->
-                    <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 flex flex-col">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Plano Mensal</h2>
-                        <p class="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white">R$ 39<span class="text-2xl font-medium text-gray-500 dark:text-gray-400">,90/mês</span></p>
-                        <ul class="mt-6 space-y-2 text-gray-600 dark:text-gray-300 text-left">
-                           <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Acesso completo</li>
-                           <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Atualizações inclusas</li>
-                        </ul>
-                        <div class="flex-grow"></div>
-                        <button class="subscribe-button mt-8 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
-                                data-price-id="price_1SCuGt02L39AfqKm9PqFGDLu" 
-                                data-mode="subscription">
-                            Assinar Mensal
-                        </button>
-                    </div>
-
-                    <!-- Plano Anual (Destaque) -->
-                    <div class="border-2 border-orange-500 rounded-xl p-6 flex flex-col relative">
-                        <div class="absolute top-0 -translate-y-1/2 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</div>
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Plano Anual</h2>
-                        <p class="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white">R$ 399<span class="text-2xl font-medium text-gray-500 dark:text-gray-400">/ano</span></p>
-                         <p class="font-semibold text-green-600 dark:text-green-400">Economize R$ 79,80! (2 meses grátis)</p>
-                        <ul class="mt-6 space-y-2 text-gray-600 dark:text-gray-300 text-left">
-                           <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Acesso completo</li>
-                           <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Atualizações inclusas</li>
-                        </ul>
-                        <div class="flex-grow"></div>
-                        <button class="subscribe-button mt-8 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
-                                data-price-id="price_1SCuK802L39AfqKmG5cnTMmO"
-                                data-mode="subscription">
-                            Assinar Anual
-                        </button>
-                    </div>
-
-                    <!-- Plano Vitalício -->
-                    <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 flex flex-col">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Acesso Vitalício</h2>
-                        <p class="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white">R$ 997<span class="text-2xl font-medium text-gray-500 dark:text-gray-400"></span></p>
-                        <p class="font-semibold text-gray-500 dark:text-gray-400">Pagamento único</p>
-                        <ul class="mt-6 space-y-2 text-gray-600 dark:text-gray-300 text-left">
-                           <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Acesso para sempre</li>
-                           <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Todas futuras atualizações</li>
-                        </ul>
-                        <div class="flex-grow"></div>
-                        <button class="subscribe-button mt-8 w-full bg-gray-700 hover:bg-gray-900 dark:bg-gray-200 dark:hover:bg-white dark:text-gray-900 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
-                                data-price-id="price_1SCuLC02L39AfqKm5xsl4G96"
-                                data-mode="payment">
-                            Comprar Acesso Vitalício
-                        </button>
-                    </div>
-                </div>
-
-                <div id="payment-status" class="mt-6 text-sm font-semibold h-6"></div>
-                 <button id="logout-button" class="mt-4 text-gray-500 dark:text-gray-400 font-semibold hover:underline">
-                    Sair
-                </button>
-            </div>
-        </div>
+<body>
+  <header>
+    <div class="brand">Dinheiro na Internet — Calculadora</div>
+    <div class="top-actions">
+      <div id="userInfo" class="small">Não autenticado</div>
+      <button id="btnLogin" class="secondary">Entrar / Registrar</button>
+      <button id="btnLogout" class="hidden">Sair</button>
     </div>
+  </header>
 
-    <!-- Container para a calculadora (para membros premium) -->
-    <div id="premium-content" class="hidden">
-        <!-- O CÓDIGO DA SUA CALCULADORA ORIGINAL COMEÇA AQUI -->
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <div id="user-info" class="text-sm text-gray-500 dark:text-gray-400"></div>
-                <div>
-                    <button id="dark-mode-toggle" class="btn p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    </button>
-                     <button id="logout-button-calculator" class="ml-2 btn bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm hover:bg-red-700">Sair</button>
-                </div>
-            </div>
+  <!-- Área principal -->
+  <main>
+    <!-- Mensagem breve -->
+    <section class="card">
+      <strong>Uso:</strong> se você tem a role <code>premium</code>, verá a calculadora. Caso contrário, verá os planos disponíveis.
+    </section>
 
-            <header class="text-center mb-10">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-orange-600">Calculadora de Precificação Profissional V1.20</h1>
-                <h2 class="text-2xl md:text-3xl font-bold card-header mt-1" contenteditable="true">J. A. Doceria</h2>
-                <p class="mt-3 card-subheader">Crie, precifique e gerencie suas receitas. Seus dados são salvos automaticamente.</p>
-            </header>
-            
-            <div id="status-bar" class="status-bar card p-4 mb-8 flex items-center justify-between flex-wrap gap-4">
-                <div id="status-text" class="text-sm card-subheader font-semibold">Bem-vindo!</div>
-                <div class="flex space-x-2 flex-wrap gap-2">
-                    <button id="save-btn" class="btn bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm hover:bg-blue-700">Salvar Manualmente</button>
-                    <button id="import-btn" class="btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm hover:bg-green-700">Importar Dados</button>
-                    <button id="export-btn" class="btn bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm hover:bg-blue-700">Exportar Dados</button>
-                    <button id="reset-btn" class="btn bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm hover:bg-red-700">Voltar ao Padrão</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                <div class="card p-6 rounded-lg shadow">
-                    <h3 class="font-bold text-lg border-b pb-2 mb-4 border-color card-header">Parâmetros de Precificação</h3>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 items-center gap-4">
-                            <label for="markup" class="font-semibold card-subheader">Margem de Lucro (Multiplicador)</label>
-                            <div class="flex rounded-lg overflow-hidden border border-color focus-within:ring-2 focus-within:ring-orange-500">
-                                <input type="number" id="markup" value="3.5" step="0.1" class="savable w-full p-2 border-0 input-price input-yellow focus:ring-0">
-                                <span id="markup-percentage" class="flex items-center justify-center text-sm font-bold text-gray-700 bg-gray-200 px-3 border-l border-color whitespace-nowrap">-- %</span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 items-center gap-4">
-                            <label for="labor-cost-per-hour" class="font-semibold card-subheader">Custo de Produção por Hora (R$)</label>
-                            <input type="number" id="labor-cost-per-hour" value="0" step="0.01" class="savable w-24 p-2 border rounded input-price input-yellow justify-self-end border-color">
-                        </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 -mt-2">
-                            *Valor de custo pode ser incluído direto na margem de lucro, deixando esse campo em 0.
-                        </p>
-                        <div class="grid grid-cols-2 items-center gap-4">
-                            <label for="ifood-tax" class="font-semibold card-subheader">Taxa iFood (%)</label>
-                            <input type="number" id="ifood-tax" value="28" class="savable w-24 p-2 border rounded input-price input-yellow justify-self-end border-color">
-                        </div>
-                        <div class="grid grid-cols-2 items-center gap-4">
-                            <label for="extra-fee-r" class="font-semibold card-subheader">Taxa Adicional (R$)</label>
-                            <input type="number" id="extra-fee-r" value="0" step="0.01" class="savable w-24 p-2 border rounded input-price input-yellow justify-self-end border-color">
-                        </div>
-                        <div class="grid grid-cols-2 items-center gap-4">
-                            <label for="extra-fee-p" class="font-semibold card-subheader">Taxa Adicional (%)</label>
-                            <input type="number" id="extra-fee-p" value="0" step="0.1" class="savable w-24 p-2 border rounded input-price input-yellow justify-self-end border-color">
-                        </div>
-                        <div class="grid grid-cols-2 items-center gap-4 border-t pt-4 mt-2 border-color">
-                            <span class="font-semibold card-subheader">Itens Cadastrados</span>
-                            <span id="recipe-count" class="font-bold text-lg text-orange-600 text-right">0</span>
-                        </div>
-                        <div class="grid grid-cols-2 items-center gap-4 pt-2 border-t mt-2 border-color">
-                            <span class="font-semibold card-subheader">Vendas para Cobrir Custos (Ponto de Equilíbrio)</span>
-                            <span id="break-even-units" class="font-extrabold text-xl text-red-600 dark:text-red-400 text-right">0 un.</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card p-6 rounded-lg shadow">
-                    <div class="flex justify-between items-center border-b pb-2 mb-4 border-color"><h3 class="font-bold text-lg card-header">Custos Fixos Mensais</h3><button id="add-fixed-cost-btn" class="btn bg-gray-200 text-gray-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">+ Adicionar Custo</button></div>
-                    <div id="fixed-costs-list" class="space-y-2"></div>
-                    <div class="text-right font-bold text-lg pt-2 border-t mt-4 border-color"><span>TOTAL: </span><span id="fixed-costs-total">R$ 0,00</span></div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        *Este valor **NÃO** é incluído nos produtos. É usado apenas para controle visual e cálculo do Ponto de Equilíbrio.
-                    </p>
-                </div>
-            </div>
-
-            <div class="card p-6 rounded-lg shadow mb-10">
-                <div class="flex justify-between items-center border-b pb-2 mb-4 border-color">
-                    <h3 class="font-bold text-lg card-header">Base de Custo das Embalagens</h3>
-                    <div class="flex space-x-2">
-                        <button id="toggle-packaging-base-btn" class="btn bg-gray-200 text-gray-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Ocultar Embalagens</button>
-                        <button id="clear-packaging-btn" class="btn bg-red-100 text-red-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-800/50">Limpar Embalagens</button>
-                    </div>
-                </div>
-                <div id="packaging-base-container" class="recipe-details" style="max-height: 2000px;">
-                    <div id="packaging-base" class="space-y-2"></div>
-                </div>
-                <div class="border-t pt-4 mt-4 space-y-2 border-color">
-                    <p class="text-sm font-bold card-header">Adicionar Nova Embalagem à Base:</p>
-                    <div class="grid grid-cols-5 gap-x-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                        <span class="col-span-2">Nome da Embalagem</span>
-                        <span class="col-span-1">Preço Compra (R$)</span>
-                        <span class="col-span-1">Qtd. na Embalagem</span>
-                        <span class="col-span-1"></span>
-                    </div>
-                    <div class="grid grid-cols-5 gap-x-2 text-sm">
-                        <input type="text" id="new-packaging-name" placeholder="Ex: Pote 250ml / Sacola Kraft" class="input-bg col-span-2 p-2 border rounded border-color input-text">
-                        <input type="number" id="new-packaging-price" placeholder="Preço Total" class="input-bg col-span-1 p-2 border rounded input-price input-yellow border-color" step="0.01">
-                        <input type="number" id="new-packaging-qty" placeholder="Qtd. total (un.)" class="input-bg col-span-1 p-2 border rounded input-price input-yellow border-color">
-                        <button id="add-packaging-btn" class="btn bg-orange-500 text-white font-bold p-2 rounded-lg col-span-1">Adicionar Embalagem</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card p-6 rounded-lg shadow mb-10">
-                <div class="flex justify-between items-center border-b pb-2 mb-4 border-color">
-                    <h3 class="font-bold text-lg card-header">Base de Custo dos Ingredientes</h3>
-                    <div class="flex space-x-2">
-                        <button id="toggle-base-btn" class="btn bg-gray-200 text-gray-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Ocultar Ingredientes</button>
-                        <button id="clear-ingredients-btn" class="btn bg-red-100 text-red-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-800/50">Limpar Ingredientes</button>
-                    </div>
-                </div>
-                <div id="ingredients-base-container" class="recipe-details" style="max-height: 2000px;"> 
-                    <div id="ingredients-base" class="space-y-2"></div>
-                </div>
-                <div class="border-t pt-4 mt-4 space-y-2 border-color">
-                    <p class="text-sm font-bold card-header">Adicionar Novo Ingrediente à Base:</p>
-                    <div class="grid grid-cols-5 gap-x-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                        <span class="col-span-1">Nome</span>
-                        <span class="col-span-1">Un. Compra</span>
-                        <span class="col-span-1">Un. Uso</span>
-                        <span class="col-span-1">Qtd. Total / Rend. Líquido</span>
-                        <span class="col-span-1"></span>
-                    </div>
-                    <div class="grid grid-cols-5 gap-x-2 text-sm">
-                        <input type="text" id="new-ingredient-name" placeholder="Nome do Ingrediente" class="input-bg col-span-1 p-2 border rounded border-color input-text">
-                        <select id="new-ingredient-unitBuy" class="input-bg col-span-1 p-2 border rounded border-color input-text">
-                            <option value="Kg">Kg (Quilo)</option><option value="un">un (Unidade)</option><option value="Dúzia">Dúzia</option><option value="Pacote">Pacote</option><option value="Garrafa">Garrafa</option><option value="Pote">Pote</option>
-                        </select>
-                        <select id="new-ingredient-unitUse" class="input-bg col-span-1 p-2 border rounded border-color input-text">
-                            <option value="g">g (Grama)</option><option value="un">un (Unidade)</option><option value="ml">ml (Mililitro)</option>
-                        </select>
-                        <input type="number" id="new-ingredient-defaultQty" placeholder="Qtd. Embalagem/Rendimento" class="input-bg col-span-1 p-2 border rounded input-price input-yellow border-color">
-                        <button id="add-ingredient-btn" class="btn bg-orange-500 text-white font-bold p-2 rounded-lg col-span-1">Adicionar Ingrediente</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
-                <h3 class="text-2xl font-bold section-header">Fichas Técnicas dos Itens</h3>
-                <div class="flex items-center space-x-2 w-full md:w-auto">
-                    <input type="search" id="search-input" placeholder="🔎 Buscar por nome ou ingrediente..." class="input-bg w-full p-2 border rounded-lg border-color input-text">
-                    <button id="clear-recipes-btn" class="btn bg-red-100 text-red-700 text-sm font-bold py-2 px-4 rounded-lg shadow-sm border border-red-200 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-800/50">Limpar Itens</button>
-                    <button id="toggle-all-cards-btn" class="toggle-all-btn btn bg-white text-gray-700 text-sm font-bold py-2 px-4 rounded-lg shadow-sm border border-color hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700">Ocultar Todos</button>
-                </div>
-            </div>
-            <div id="burgers-fichas" class="space-y-8"></div>
-            
-            <div class="card p-6 rounded-lg shadow mt-10 border-t-4 border-orange-500">
-                <h3 class="font-bold text-lg border-b pb-2 mb-4 border-color card-header">Criar Novo Item (Card)</h3>
-                <div class="space-y-3">
-                    <input type="text" id="new-recipe-name" placeholder="Nome do Novo Item" class="input-bg w-full p-2 border rounded border-color input-text">
-                    <div class="flex items-center space-x-4">
-                        <select id="new-recipe-type" class="w-1/3 p-2 border rounded border-color input-bg input-text">
-                            <option value="recipe">Receita (Composto)</option>
-                            <option value="single">Produto Único (Industrializado)</option>
-                        </select>
-                        <button id="add-recipe-btn" class="btn bg-green-600 text-white font-bold p-2 rounded-lg w-2/3 whitespace-nowrap">Criar Novo Item</button>
-                    </div>
-                </div>
-            </div>
+    <!-- Área da Calculadora (apenas para premium) -->
+    <section id="calculatorSection" class="card hidden">
+      <h2>Calculadora de Precificação</h2>
+      <div>
+        <label for="cost">Custo (R$)</label>
+        <input id="cost" type="number" step="0.01" value="50">
+        <label for="markup">Markup (%)</label>
+        <input id="markup" type="number" step="0.01" value="30">
+        <label for="quantity">Quantidade prevista por mês</label>
+        <input id="quantity" type="number" step="1" value="100">
+        <div style="margin-top:10px;">
+          <button id="calcBtn">Calcular</button>
         </div>
-        <!-- O CÓDIGO DA SUA CALCULADORA ORIGINAL TERMINA AQUI -->
-    </div>
+        <div id="result" style="margin-top:12px;" class="small"></div>
+      </div>
+    </section>
 
-    <!-- Script de controle de acesso e da calculadora -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const subscriptionPrompt = document.getElementById('subscription-prompt');
-            const premiumContent = document.getElementById('premium-content');
-            const logoutButton = document.getElementById('logout-button');
-            const logoutButtonCalc = document.getElementById('logout-button-calculator');
-            const paymentStatus = document.getElementById('payment-status');
-            const userInfo = document.getElementById('user-info');
-            const subscribeButtons = document.querySelectorAll('.subscribe-button');
+    <!-- Área dos Planos (padrão para não-premium) -->
+    <section id="plansSection" class="card hidden">
+      <h2>Escolha um plano</h2>
+      <div class="plans">
+        <div class="plan">
+          <h3>Mensal</h3>
+          <p class="small">R$ — renovação mensal</p>
+          <button class="subscribeBtn" data-price-id="price_1SCuGt02L39AfqKm9PqFGDLu" data-mode="subscription">Assinar Mensal</button>
+        </div>
 
+        <div class="plan">
+          <h3>Anual</h3>
+          <p class="small">Melhor custo-benefício</p>
+          <button class="subscribeBtn" data-price-id="price_1SCuK802L39AfqKmG5cnTMmO" data-mode="subscription">Assinar Anual</button>
+        </div>
 
-            const handleAuth = (user) => {
-                if (user) {
-                    const isPremium = user.app_metadata.roles && user.app_metadata.roles.includes('premium');
-                    
-                    if (isPremium) {
-                        subscriptionPrompt.classList.add('hidden');
-                        premiumContent.classList.remove('hidden');
-                        if (userInfo) userInfo.textContent = `Logado como: ${user.email}`;
-                        initCalculator();
-                    } else {
-                        premiumContent.classList.add('hidden');
-                        subscriptionPrompt.classList.remove('hidden');
-                    }
-                } else {
-                    window.location.href = '/index.html';
-                }
-            };
+        <div class="plan">
+          <h3>Vitalício</h3>
+          <p class="small">Pagamento único</p>
+          <button class="subscribeBtn" data-price-id="price_1SCuLC02L39AfqKm5xsl4G96" data-mode="payment">Comprar Vitalício</button>
+        </div>
+      </div>
 
-            netlifyIdentity.on('init', user => handleAuth(user));
-            netlifyIdentity.on('login', user => handleAuth(user));
-            netlifyIdentity.on('logout', () => {
-                window.location.href = '/index.html';
-            });
-            
-            if(logoutButton) logoutButton.addEventListener('click', () => netlifyIdentity.logout());
-            if(logoutButtonCalc) logoutButtonCalc.addEventListener('click', () => netlifyIdentity.logout());
+      <div id="paymentStatus" class="small"></div>
+    </section>
 
-            subscribeButtons.forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    const priceId = e.target.dataset.priceId;
-                    const mode = e.target.dataset.mode;
+  </main>
 
-                    if (!priceId || !mode) {
-                        console.error('Price ID ou Mode não encontrado no botão.');
-                        return;
-                    }
+  <script>
+    // Inicializa Netlify Identity
+    const netlifyIdentity = window.netlifyIdentity;
+    netlifyIdentity.init();
 
-                    if(paymentStatus) paymentStatus.textContent = 'A gerar link de pagamento...';
-                    try {
-                        const response = await fetch('/.netlify/functions/create-checkout-session', {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${netlifyIdentity.currentUser().token.access_token}`
-                            },
-                            body: JSON.stringify({ priceId, mode })
-                        });
+    // Elementos DOM
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    const userInfo = document.getElementById('userInfo');
+    const calculatorSection = document.getElementById('calculatorSection');
+    const plansSection = document.getElementById('plansSection');
+    const paymentStatus = document.getElementById('paymentStatus');
 
-                        if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(errorData.error || 'Falha ao criar a sessão de pagamento.');
-                        }
+    // Função utilitária para pegar o user object de forma segura
+    function getCurrentUser() {
+      try {
+        const user = netlifyIdentity.currentUser();
+        if (!user) return null;
+        // Em algumas versões a estrutura é user.id ou user.sub; adaptamos
+        const id = user.id || (user.user_metadata && user.user_metadata.id) || (user.sub);
+        return Object.assign({}, user, { id });
+      } catch (err) {
+        return null;
+      }
+    }
 
-                        const { redirect_url } = await response.json();
-                        window.location.href = redirect_url;
+    // Verifica se o usuário tem a role 'premium'
+    function userIsPremium(user) {
+      if (!user) return false;
+      // tentar app_metadata.roles, ou roles diretamente
+      const roles = (user.app_metadata && user.app_metadata.roles) || user.roles || [];
+      return Array.isArray(roles) && roles.includes('premium');
+    }
 
-                    } catch (error) {
-                        if(paymentStatus) paymentStatus.textContent = `Erro: ${error.message}`;
-                        console.error('Stripe checkout error:', error);
-                    }
-                });
-            });
+    // Atualiza UI conforme usuário/logged state/roles
+    function refreshUI() {
+      const user = getCurrentUser();
+      if (user) {
+        userInfo.textContent = `Olá, ${user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : (user.email || user.id)}`;
+        btnLogin.classList.add('hidden');
+        btnLogout.classList.remove('hidden');
+      } else {
+        userInfo.textContent = 'Não autenticado';
+        btnLogin.classList.remove('hidden');
+        btnLogout.classList.add('hidden');
+      }
 
-            netlifyIdentity.init();
+      // Mostrar calculadora apenas se premium
+      if (user && userIsPremium(user)) {
+        calculatorSection.classList.remove('hidden');
+        plansSection.classList.add('hidden');
+      } else {
+        calculatorSection.classList.add('hidden');
+        plansSection.classList.remove('hidden');
+      }
+    }
 
-            // =====================================================================
-            // INÍCIO DA LÓGICA DA CALCULADORA
-            // =====================================================================
-            function initCalculator() {
-                // ... (O código completo e minificado da sua calculadora entra aqui para poupar espaço)
-                const initialIngredients = { 'Hambúrguer Blend 120g': { unitBuy: 'Kg', unitUse: 'g', defaultQty: 1000 }, 'Queijo Prato': { unitBuy: 'Kg', unitUse: 'g', defaultQty: 1000 }, 'Bacon': { unitBuy: 'Kg', unitUse: 'g', defaultQty: 1000 }, 'Calabresa': { unitBuy: 'Kg', unitUse: 'g', defaultQty: 1000 }, 'Tomate': { unitBuy: 'Kg', unitUse: 'g', defaultQty: 1000 }, 'Pão de Brioche': { unitBuy: 'un', unitUse: 'un', defaultQty: 1 }, 'Ovo': { unitBuy: 'Dúzia', unitUse: 'un', defaultQty: 12 }, 'Alface Americana': { unitBuy: 'Unidade', unitUse: 'g', defaultQty: 250 }, 'Maionese Verde': { unitBuy: 'Pote', unitUse: 'ml', defaultQty: 1000 }, 'Molho Barbecue': { unitBuy: 'Galão', unitUse: 'ml', defaultQty: 3000 }, 'Chimichurri seco': { unitBuy: 'Pacote', unitUse: 'g', defaultQty: 100 }, 'Azeite': { unitBuy: 'Garrafa', unitUse: 'g', defaultQty: 1000 }, 'Cebola Crispy': { unitBuy: 'Pacote', unitUse: 'g', defaultQty: 500 }, };
-                const initialPackaging = { 'Hamburgueiras de Isopor- Modelo H03': { price: 0.00, qty: 50 }, 'Sacos Barreira Anti-gordura': { price: 0.00, qty: 100 }, 'Copos de Açai 300ml com tampa': { price: 0.00, qty: 50 }, 'Copos de Açai 500ml com tampa': { price: 0.00, qty: 50 }, 'Sacos plásticos branco': { price: 0.00, qty: 100 }, 'Sacos de Papel Kraft SEM alça M': { price: 0.00, qty: 20 }, 'Sacos de Papel Kraft SEM alça G': { price: 0.00, qty: 20 }, 'Lacres de segurança adesivos': { price: 0.00, qty: 100 }, };
-                const initialRecipes = { 'Supremo Salada (X-Salada)': { type: 'recipe', items: { 'Pão de Brioche': 1, 'Hambúrguer Blend 120g': 120, 'Queijo Prato': 30, 'Alface Americana': 20, 'Tomate': 30, 'Maionese Verde': 30 }, packaging: {'Sacos de Papel Kraft SEM alça G': 1}, prepTime: 0 }, 'Bacon BBQ Crispy': { type: 'recipe', items: { 'Pão de Brioche': 1, 'Hambúrguer Blend 120g': 120, 'Queijo Prato': 30, 'Bacon': 30, 'Cebola Crispy': 15, 'Molho Barbecue': 30 }, packaging: {'Sacos de Papel Kraft SEM alça G': 1}, prepTime: 0 }, 'Calabresa Chimi': { type: 'recipe', items: { 'Pão de Brioche': 1, 'Hambúrguer Blend 120g': 120, 'Queijo Prato': 30, 'Calabresa': 40, 'Chimichurri seco': 5, 'Azeite': 15 }, packaging: {'Sacos de Papel Kraft SEM alça G': 1}, prepTime: 0 }, 'Royale Egg Bacon': { type: 'recipe', items: { 'Pão de Brioche': 1, 'Hambúrguer Blend 120g': 120, 'Queijo Prato': 30, 'Bacon': 30, 'Ovo': 1, 'Maionese Verde': 30 }, packaging: {'Sacos de Papel Kraft SEM alça G': 1}, prepTime: 0 }, 'Gigante J.A. (X-Tudo)': { type: 'recipe', items: { 'Pão de Brioche': 1, 'Hambúrguer Blend 120g': 120, 'Queijo Prato': 30, 'Calabresa': 30, 'Bacon': 30, 'Ovo': 1, 'Alface Americana': 15, 'Tomate': 20, 'Maionese Verde': 30 }, packaging: {'Sacos de Papel Kraft SEM alça G': 1}, prepTime: 0 }, 'Coca-Cola Lata': { type: 'single', cost: 0, packaging: {}, prepTime: 0 } };
-                const initialFixedCosts = [ { id: Date.now() + 1, name: 'Aluguel', value: '700' }, { id: Date.now() + 2, name: 'Luz', value: '100' }, { id: Date.now() + 3, name: 'Água', value: '30' }, { id: Date.now() + 4, name: 'Internet', value: '50' }, { id: Date.now() + 5, name: 'Gás', value: '50' } ];
-                let ingredients, recipes, fixedCosts, packaging;
-                const STORAGE_KEY = 'jaBurgersCalculatorData_v14';
-                const getEl = (id) => document.getElementById(id);
-                function sanitizeForId(str) { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, ''); }
-                function formatCurrency(value) { if (isNaN(value)) return 'R$ 0,00'; return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-                function updateStatus(message, type = 'info') { const statusBar = getEl('status-bar'); const statusText = getEl('status-text'); if(!statusBar || !statusText) return; statusText.textContent = message; statusBar.classList.remove('bg-green-100', 'bg-yellow-100', 'bg-red-100', 'dark:bg-green-900/50', 'dark:bg-yellow-800/50', 'dark:bg-red-900/50'); if (type === 'success') statusBar.classList.add('bg-green-100', 'dark:bg-green-900/50'); else if (type === 'warning') statusBar.classList.add('bg-yellow-100', 'dark:bg-yellow-800/50'); else if (type === 'error') statusBar.classList.add('bg-red-100', 'dark:bg-red-900/50'); else statusBar.classList.add('bg-white', 'dark:bg-gray-700'); }
-                function getSavableValues() { const values = {}; document.querySelectorAll('.savable').forEach(input => { values[input.id] = input.value; }); return values; }
-                function applySavableValues(data) { document.querySelectorAll('.savable').forEach(input => { if (data[input.id] !== undefined) { input.value = data[input.id]; } }); }
-                function calculateAll() { let totalFixedCost = 0; document.querySelectorAll('#fixed-costs-list .fixed-cost-value').forEach(input => { totalFixedCost += parseFloat(input.value) || 0; }); const fixedCostsTotalEl = getEl('fixed-costs-total'); if (fixedCostsTotalEl) fixedCostsTotalEl.textContent = formatCurrency(totalFixedCost); let totalDirectPrice = 0; let totalVariableCost = 0; let recipeCountWithCost = 0; const markupEl = getEl('markup'); const markup = markupEl ? parseFloat(markupEl.value) || 0 : 0; const markupPercentageEl = getEl('markup-percentage'); if (markupPercentageEl) { if (markup > 1) { const profitMargin = ((markup - 1) / markup) * 100; markupPercentageEl.textContent = `${profitMargin.toFixed(1)}%`; } else { markupPercentageEl.textContent = `Prejuízo`; } } const laborCostPerHourEl = getEl('labor-cost-per-hour'); const laborCostPerHour = laborCostPerHourEl ? parseFloat(laborCostPerHourEl.value) || 0 : 0; const costPerMinute = laborCostPerHour / 60; const ifoodTaxEl = getEl('ifood-tax'); const ifoodTax = (ifoodTaxEl ? parseFloat(ifoodTaxEl.value) || 28 : 28) / 100; const extraFeeREl = getEl('extra-fee-r'); const extraFeeR = extraFeeREl ? parseFloat(extraFeeREl.value) || 0 : 0; const extraFeePEl = getEl('extra-fee-p'); const extraFeeP = (extraFeePEl ? parseFloat(extraFeePEl.value) || 0 : 0) / 100; const costsPerUnit = {}; document.querySelectorAll('#ingredients-base .ingredient-row').forEach(row => { const name = row.dataset.name; const id = sanitizeForId(name); const priceEl = getEl(`price-${id}`); const qtyEl = getEl(`qty-${id}`); const costEl = getEl(`cost-${id}`); const price = priceEl ? parseFloat(priceEl.value) : 0; const qty = qtyEl ? parseFloat(qtyEl.value) : (ingredients[name] ? ingredients[name].defaultQty : 1); const cost = price > 0 && qty > 0 ? price / qty : 0; costsPerUnit[name] = cost; if(costEl) costEl.textContent = cost > 0 ? formatCurrency(cost) : 'R$ 0,00'; }); const packagingCostsPerUnit = {}; document.querySelectorAll('#packaging-base .packaging-row').forEach(row => { const name = row.dataset.name; const id = sanitizeForId(name); const priceEl = getEl(`pkg-price-${id}`); const qtyEl = getEl(`pkg-qty-${id}`); const costEl = getEl(`pkg-cost-${id}`); const price = priceEl ? parseFloat(priceEl.value) : 0; const qty = qtyEl ? parseFloat(qtyEl.value) : (packaging[name] ? packaging[name].qty : 1); const cost = price > 0 && qty > 0 ? price / qty : 0; packagingCostsPerUnit[name] = cost; if(costEl) costEl.textContent = cost > 0 ? formatCurrency(cost) : 'R$ 0,00'; }); document.querySelectorAll('.item-card').forEach(card => { const itemName = card.dataset.name; const itemId = sanitizeForId(itemName); let totalCost = 0; let ingredientCost = 0; let packagingCost = 0; let laborCost = 0; const recipe = recipes[itemName]; if (recipe && recipe.type === 'recipe') { card.querySelectorAll('.recipe-ingredient-row').forEach(row => { const ingredientName = row.dataset.name; const qtyEl = getEl(`qty-${itemId}-${sanitizeForId(ingredientName)}`); const qty = qtyEl ? parseFloat(qtyEl.value) : 0; const ingredientUnitCost = costsPerUnit[ingredientName] || 0; const itemCost = ingredientUnitCost * qty; ingredientCost += itemCost; const costEl = getEl(`cost-${itemId}-${sanitizeForId(ingredientName)}`); if(costEl) costEl.textContent = formatCurrency(itemCost); }); } else if (recipe && recipe.type === 'single') { const costInput = getEl(`cost-${itemId}`); ingredientCost = costInput ? parseFloat(costInput.value) : 0; if(recipes[itemName]) recipes[itemName].cost = ingredientCost; } const pkgInputContainer = getEl(`packaging-input-container-${itemId}`); if (pkgInputContainer) { pkgInputContainer.querySelectorAll('.recipe-packaging-row').forEach(row => { const pkgName = row.dataset.name; const qtyEl = getEl(`pkg-qty-${itemId}-${sanitizeForId(pkgName)}`); const qty = qtyEl ? parseFloat(qtyEl.value) : 0; const pkgUnitCost = packagingCostsPerUnit[pkgName] || 0; const itemCost = pkgUnitCost * qty; packagingCost += itemCost; const costEl = getEl(`pkg-cost-${itemId}-${sanitizeForId(pkgName)}`); if(costEl) costEl.textContent = formatCurrency(itemCost); }); } const prepTimeInput = getEl(`prep-time-${itemId}`); const prepTime = prepTimeInput ? parseFloat(prepTimeInput.value) : 0; if (prepTime > 0 && costPerMinute > 0) { laborCost = prepTime * costPerMinute; } totalCost = ingredientCost + packagingCost + laborCost; const ingredientCostEl = getEl(`ingredient-cost-${itemId}`); if(ingredientCostEl) ingredientCostEl.textContent = formatCurrency(ingredientCost); const packagingCostEl = getEl(`packaging-cost-${itemId}`); if(packagingCostEl) packagingCostEl.textContent = formatCurrency(packagingCost); const laborCostEl = getEl(`labor-cost-${itemId}`); if(laborCostEl) laborCostEl.textContent = formatCurrency(laborCost); const totalCostEl = getEl(`total-cost-${itemId}`); if(totalCostEl) totalCostEl.textContent = formatCurrency(totalCost); const basePrice = totalCost * markup; let totalExtraFee = extraFeeR + (basePrice * extraFeeP); let directPrice = basePrice + totalExtraFee; let ifoodPrice = 0; if (basePrice > 0) { const ifoodFactor = 1 - ifoodTax; let baseIfoodPrice = (ifoodFactor > 0) ? basePrice / ifoodFactor : basePrice * 100; ifoodPrice = baseIfoodPrice + totalExtraFee; } const directPriceEl = getEl(`direct-price-${itemId}`); if(directPriceEl) directPriceEl.textContent = formatCurrency(directPrice); const directPriceCompactEl = getEl(`direct-price-compact-${itemId}`); if(directPriceCompactEl) directPriceCompactEl.textContent = formatCurrency(directPrice); const ifoodPriceEl = getEl(`ifood-price-${itemId}`); if(ifoodPriceEl) ifoodPriceEl.textContent = formatCurrency(ifoodPrice); const ifoodPriceCompactEl = getEl(`ifood-price-compact-${itemId}`); if(ifoodPriceCompactEl) ifoodPriceCompactEl.textContent = formatCurrency(ifoodPrice); if (totalCost > 0 && directPrice > 0) { totalDirectPrice += directPrice; totalVariableCost += totalCost; recipeCountWithCost++; } }); const breakEvenEl = getEl('break-even-units'); if (breakEvenEl) { if (recipeCountWithCost > 0 && totalFixedCost > 0) { const avgVariableCost = totalVariableCost / recipeCountWithCost; const avgDirectPrice = totalDirectPrice / recipeCountWithCost; const avgContributionMargin = avgDirectPrice - avgVariableCost; if (avgContributionMargin > 0) { const unitsToSell = totalFixedCost / avgContributionMargin; breakEvenEl.textContent = `${Math.ceil(unitsToSell).toLocaleString('pt-BR')} un.`; } else { breakEvenEl.textContent = 'Prejuízo!'; } } else { breakEvenEl.textContent = '0 un.'; } } }
-                function getQtyLabel(data) { const { unitBuy, unitUse } = data; if (unitBuy === 'Kg' && unitUse === 'g') return `Qtd. em Gramas (1000g)`; if (unitBuy === 'Unidade' && unitUse === 'g') return `Rendimento Líquido (g)`; if (unitUse === 'ml') return `Qtd. em Mililitros (${data.defaultQty || 0}ml)`; if (unitBuy === 'Dúzia' && unitUse === 'un') return `Unidades na Dúzia`; if (unitBuy === unitUse) return `Qtd. na Embalagem (${unitBuy})`; return `Qtd. na Embalagem`; }
-                function renderPackaging() { const packagingBaseEl = getEl('packaging-base'); if(!packagingBaseEl) return; packagingBaseEl.innerHTML = ''; const header = document.createElement('div'); header.className = 'grid grid-cols-12 gap-x-4 gap-y-1 font-bold text-xs card-subheader mb-2'; header.innerHTML = `<div class="col-span-4">Embalagem</div><div class="col-span-2 text-center">Preço Compra</div><div class="col-span-3 text-center">Qtd. na Embalagem (un.)</div><div class="col-span-2 text-right">Custo p/ Unidade</div><div class="col-span-1"></div>`; packagingBaseEl.appendChild(header); Object.keys(packaging).forEach(name => { const data = packaging[name]; const id = sanitizeForId(name); const row = document.createElement('div'); row.className = 'grid grid-cols-12 gap-x-4 gap-y-1 items-center border-t pt-2 packaging-row border-color'; row.dataset.name = name; row.innerHTML = `<label class="col-span-4 font-semibold text-sm">${name}</label><div class="col-span-2"><input type="number" id="pkg-price-${id}" value="${data.price || ''}" placeholder="R$" class="savable w-full p-1 border rounded text-sm input-price input-yellow border-color" step="0.01"></div><div class="col-span-3 flex items-center justify-center"><input type="number" id="pkg-qty-${id}" value="${data.qty || 1}" class="savable w-20 p-1 border rounded text-sm input-price input-yellow border-color"><span class="text-xs ml-2 card-subheader text-left w-24">unidades</span></div><div class="col-span-2 text-right"><span id="pkg-cost-${id}" class="p-1 text-xs text-right calculated font-mono rounded">R$ 0,00</span><span class="text-xs card-subheader">/un</span></div><div class="col-span-1 flex justify-end"><button data-name="${name}" class="remove-packaging-base-btn btn bg-gray-200 text-gray-600 text-xs font-bold p-1 rounded-lg hover:bg-red-200 hover:text-red-700 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-red-500">×</button></div>`; packagingBaseEl.appendChild(row); }); }
-                function renderAll() { const burgersFichasEl = getEl('burgers-fichas'); const ingredientsBaseEl = getEl('ingredients-base'); const fixedCostsListEl = getEl('fixed-costs-list'); if(!burgersFichasEl || !ingredientsBaseEl || !fixedCostsListEl) return; renderPackaging(); const recipeCountEl = getEl('recipe-count'); if(recipeCountEl) recipeCountEl.textContent = Object.keys(recipes).length; fixedCostsListEl.innerHTML = ''; fixedCosts.forEach(cost => { const itemEl = document.createElement('div'); itemEl.className = 'flex items-center space-x-2'; itemEl.innerHTML = `<input type="text" id="fixed-cost-name-${cost.id}" data-id="${cost.id}" value="${cost.name}" placeholder="Nome do Custo" class="fixed-cost-name savable w-full p-2 border rounded text-sm input-bg border-color input-text"><input type="number" id="fixed-cost-value-${cost.id}" value="${cost.value}" placeholder="R$" class="fixed-cost-value savable w-32 p-2 border rounded text-sm input-price input-yellow border-color"><button data-id="${cost.id}" class="remove-fixed-cost-btn btn bg-gray-200 text-gray-700 font-bold p-2 rounded-lg hover:bg-red-200 hover:text-red-700 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-red-500">×</button></div>`; fixedCostsListEl.appendChild(itemEl); }); ingredientsBaseEl.innerHTML = ''; const header = document.createElement('div'); header.className = 'grid grid-cols-12 gap-x-4 gap-y-1 font-bold text-xs card-subheader mb-2'; header.innerHTML = `<div class="col-span-4">Ingrediente</div><div class="col-span-2 text-center">Preço Compra</div><div class="col-span-3 text-center">Qtd. Compra / Rendimento</div><div class="col-span-2 text-right">Custo p/ Unidade</div><div class="col-span-1"></div>`; ingredientsBaseEl.appendChild(header); Object.keys(ingredients).forEach(name => { const data = ingredients[name]; const id = sanitizeForId(name); const row = document.createElement('div'); row.className = 'grid grid-cols-12 gap-x-4 gap-y-1 items-center border-t pt-2 ingredient-row border-color'; row.dataset.name = name; row.innerHTML = `<label class="col-span-4 font-semibold text-sm">${name}</label><div class="col-span-2"><input type="number" id="price-${id}" placeholder="R$" class="savable w-full p-1 border rounded text-sm input-price input-yellow border-color" step="0.01"></div><div class="col-span-3 flex items-center justify-center"><input type="number" id="qty-${id}" value="${data.defaultQty}" class="savable w-20 p-1 border rounded text-sm input-price input-yellow border-color"><span class="text-xs ml-2 card-subheader text-left w-24">${getQtyLabel(data)}</span></div><div class="col-span-2 text-right"><span id="cost-${id}" class="p-1 text-xs text-right calculated font-mono rounded">R$ 0,00</span><span class="text-xs card-subheader">/${data.unitUse}</span></div><div class="col-span-1 flex justify-end"><button data-name="${name}" class="remove-ingredient-base-btn btn bg-gray-200 text-gray-600 text-xs font-bold p-1 rounded-lg hover:bg-red-200 hover:text-red-700 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-red-500">×</button></div>`; ingredientsBaseEl.appendChild(row); }); burgersFichasEl.innerHTML = ''; Object.keys(recipes).forEach(itemName => { const itemData = recipes[itemName]; const itemId = sanitizeForId(itemName); const card = document.createElement('div'); card.className = 'card p-6 rounded-lg shadow item-card'; card.dataset.name = itemName; let packagingOptionsHtml = ''; Object.keys(packaging).forEach(pkgName => { packagingOptionsHtml += `<option value="${pkgName}">${pkgName}</option>`; }); let packagingRowsHtml = ''; if(itemData.packaging) { Object.keys(itemData.packaging).forEach(pkgName => { const pkgQty = itemData.packaging[pkgName]; packagingRowsHtml += `<tr class="border-b recipe-packaging-row border-color" data-name="${pkgName}"><td class="py-2 pr-2">${pkgName}</td><td class="py-2 pr-2 text-right"><input type="number" id="pkg-qty-${itemId}-${sanitizeForId(pkgName)}" value="${pkgQty}" class="savable w-20 p-1 border rounded text-sm input-price input-yellow border-color"></td><td class="py-2 px-2">un</td><td id="pkg-cost-${itemId}-${sanitizeForId(pkgName)}" class="py-2 pr-2 text-right font-mono">R$ 0,00</td><td class="py-2 text-right"><button data-burger="${itemName}" data-packaging="${pkgName}" class="remove-recipe-packaging-btn btn bg-gray-100 text-gray-500 text-xs font-bold p-1 rounded hover:bg-red-200 hover:text-red-700 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-red-500">×</button></td></tr>`; }); } let detailsHtml = ''; if (itemData.type === 'recipe') { let ingredientsHtml = ''; if(itemData.items) { Object.keys(itemData.items).forEach(ingName => { const ingData = ingredients[ingName]; if(!ingData) return; const ingId = sanitizeForId(ingName); const ingQty = itemData.items[ingName]; ingredientsHtml += `<tr class="border-b recipe-ingredient-row border-color" data-name="${ingName}"><td class="py-2 pr-2">${ingName}</td><td class="py-2 pr-2 text-right"><input type="number" id="qty-${itemId}-${ingId}" value="${ingQty}" class="savable w-20 p-1 border rounded text-sm input-price input-yellow border-color"></td><td class="py-2 px-2">${ingData.unitUse}</td><td id="cost-${itemId}-${ingId}" class="py-2 pr-2 text-right font-mono">R$ 0,00</td><td class="py-2 text-right"><button data-burger="${itemName}" data-ingredient="${ingName}" class="remove-recipe-ingredient-btn btn bg-gray-100 text-gray-500 text-xs font-bold p-1 rounded hover:bg-red-200 hover:text-red-700 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-red-500">×</button></td></tr>`; }); } let ingOptionsHtml = ''; Object.keys(ingredients).forEach(ingName => { ingOptionsHtml += `<option value="${ingName}">${ingName}</option>`; }); detailsHtml = ` <h4 class="font-bold card-header mt-4">Ingredientes (${itemData.type === 'recipe' ? 'Receita' : 'Compra'})</h4> <table class="w-full mt-2 text-sm"><thead><tr class="text-left border-b-2 border-color"><th class="py-1 w-2/5 card-subheader">Ingrediente</th><th class="py-1 text-right card-subheader">Quantidade</th><th class="py-1 px-2 card-subheader">Unidade</th><th class="py-1 text-right card-subheader">Custo</th><th class="py-1"></th></tr></thead><tbody>${ingredientsHtml}</tbody></table> <div class="border-t pt-4 mt-4 text-sm space-y-2 border-color"> <p class="font-bold card-header">Adicionar Ingrediente à Receita:</p> <div class="flex items-center space-x-2"> <select class="add-ingredient-select w-1/2 p-2 border rounded border-color input-bg input-text"><option value="">Selecione...</option>${ingOptionsHtml}</select> <input type="number" class="add-ingredient-qty w-1/4 p-2 border rounded input-price border-color input-bg input-text" placeholder="Qtd."> <button data-burger="${itemName}" class="add-recipe-ingredient-btn btn bg-orange-500 text-white font-bold p-2 rounded-lg w-1/4">Adicionar</button> </div> </div>`; } else { detailsHtml = ` <h4 class="font-bold card-header mt-4">Custo de Compra do Item</h4> <div class="mt-2"><div class="flex items-center mt-2"><span class="text-lg font-semibold mr-2">R$</span><input type="number" id="cost-${itemId}" value="${itemData.cost || 0}" class="savable w-full p-2 border rounded text-lg input-price input-yellow border-color" step="0.01"></div></div>`; } detailsHtml += ` <h4 class="font-bold card-header mt-8">Mão de Obra Variável (CMO)</h4> <div class="flex items-center space-x-2 mt-2"> <label class="w-1/2 card-subheader">Tempo de Preparo Estimado:</label> <input type="number" id="prep-time-${itemId}" value="${itemData.prepTime || 0}" class="savable w-24 p-2 border rounded input-price input-yellow border-color" step="1"> <span class="text-sm card-subheader">minutos</span> </div> <h4 class="font-bold card-header mt-8">Embalagens Variáveis</h4> <div id="packaging-input-container-${itemId}"> <table class="w-full mt-2 text-sm"><thead><tr class="text-left border-b-2 border-color"><th class="py-1 w-2/5 card-subheader">Embalagem</th><th class="py-1 text-right card-subheader">Quantidade</th><th class="py-1 px-2 card-subheader">Unidade</th><th class="py-1 text-right card-subheader">Custo</th><th class="py-1"></th></tr></thead><tbody>${packagingRowsHtml}</tbody></table> </div> <div class="border-t pt-4 mt-4 text-sm space-y-2 border-color"> <p class="font-bold card-header">Adicionar Embalagem ao Item:</p> <div class="flex items-center space-x-2"> <select class="add-packaging-select w-1/2 p-2 border rounded border-color input-bg input-text"><option value="">Selecione...</option>${packagingOptionsHtml}</select> <input type="number" class="add-packaging-qty w-1/4 p-2 border rounded input-price border-color input-bg input-text" placeholder="Qtd. (un.)" value="1"> <button data-burger="${itemName}" class="add-recipe-packaging-btn btn bg-orange-500 text-white font-bold p-2 rounded-lg w-1/4">Adicionar</button> </div> </div>`; card.innerHTML = ` <div class="flex justify-between items-center"> <input type="text" data-original-name="${itemName}" value="${itemName}" class="recipe-name-input savable font-bold text-lg text-orange-600 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-orange-500 rounded px-1 -ml-1 cursor-pointer"> <div class="flex items-center space-x-2"> <button class="toggle-recipe-details btn bg-gray-200 text-gray-600 text-xs font-bold p-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Ocultar</button> <button data-burger="${itemName}" class="remove-recipe-card-btn btn bg-red-100 text-red-700 text-xs font-bold p-2 rounded-lg hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-800/50">Excluir</button> </div> </div> <div class="summary-compact" id="summary-compact-${itemId}" style="display: none;"> <div class="price-display bg-green-100/50 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded"> <span class="font-semibold">Balcão</span> <span id="direct-price-compact-${itemId}" class="font-extrabold text-base price-shadow-effect">R$ 0,00</span> </div> <div class="price-display bg-red-100/50 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded"> <span class="font-semibold">iFood</span> <span id="ifood-price-compact-${itemId}" class="font-extrabold text-base price-shadow-effect">R$ 0,00</span> </div> </div> <div class="recipe-details mt-4" style="max-height: 2000px;" id="details-${itemId}"> ${detailsHtml} <div class="summary-expanded mt-6 border-t pt-4 border-color"> <h4 class="font-bold card-header mb-2">Resumo de Custos Variáveis</h4> <div class="space-y-1 text-sm"> <div class="flex justify-between items-center card-subheader"><span>Custo de Ingredientes/Compra:</span> <span id="ingredient-cost-${itemId}" class="font-mono">R$ 0,00</span></div> <div class="flex justify-between items-center card-subheader"><span>Custo de Embalagem:</span> <span id="packaging-cost-${itemId}" class="font-mono">R$ 0,00</span></div> <div class="flex justify-between items-center card-subheader"><span>Custo Mão de Obra (CMO):</span> <span id="labor-cost-${itemId}" class="font-mono">R$ 0,00</span></div> </div> <div class="font-bold w-full flex justify-end items-center pt-2 border-t mt-2 border-color"> <span class="text-right text-base">CUSTO VARIÁVEL TOTAL:</span> <span id="total-cost-${itemId}" class="text-right font-extrabold text-xl ml-2 text-red-600 dark:text-red-400">R$ 0,00</span> </div> </div> <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4"> <div class="bg-green-100 dark:bg-green-900/50 p-4 rounded text-center"> <p class="font-semibold text-green-800 dark:text-green-300">Preço Venda (Balcão/Loja)</p> <p id="direct-price-${itemId}" class="font-extrabold text-2xl text-green-700 dark:text-green-400 price-shadow-effect">R$ 0,00</p> </div> <div class="bg-red-100 dark:bg-red-900/50 p-4 rounded text-center"> <p class="font-semibold text-red-800 dark:text-red-300">Preço Venda (iFood)</p> <p id="ifood-price-${itemId}" class="font-extrabold text-2xl text-red-700 dark:text-red-400 price-shadow-effect">R$ 0,00</p> </div> </div> </div> `; burgersFichasEl.appendChild(card); const detailsDiv = getEl(`details-${itemId}`); const compactDiv = getEl(`summary-compact-${itemId}`); if (detailsDiv && compactDiv && detailsDiv.style.maxHeight !== '0px') { compactDiv.style.display = 'none'; } }); calculateAll(); }
-                function exportData() { const dataToSave = getSavableValues(); dataToSave.fixedCosts = fixedCosts; dataToSave.ingredients = ingredients; dataToSave.recipes = recipes; dataToSave.packaging = packaging; const laborCostEl = getEl('labor-cost-per-hour'); if(laborCostEl) dataToSave['labor-cost-per-hour'] = laborCostEl.value; const dataStr = JSON.stringify(dataToSave, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'dados_calculadora_ja_burgers.json'; a.click(); URL.revokeObjectURL(url); updateStatus('✔ Dados exportados com sucesso!', 'success'); }
-                function importData(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); fixedCosts = data.fixedCosts || []; ingredients = data.ingredients || {}; recipes = data.recipes || {}; packaging = data.packaging || {}; renderAll(); applySavableValues(data); calculateAll(); updateStatus('✔ Dados importados com sucesso!', 'success'); } catch (error) { console.error('Erro ao ler o arquivo.', error); updateStatus('❌ Erro ao importar arquivo.', 'error'); } }; reader.readAsText(file); }
-                function saveDataToLocalStorage() { const dataToSave = getSavableValues(); dataToSave.fixedCosts = fixedCosts; dataToSave.ingredients = ingredients; dataToSave.recipes = recipes; dataToSave.packaging = packaging; dataToSave.savedAt = new Date().toISOString(); localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave)); updateStatus(`✔ Salvo automaticamente às ${new Date().toLocaleTimeString('pt-BR')}`, 'success'); }
-                function loadDataFromLocalStorage() { const savedData = localStorage.getItem(STORAGE_KEY); if(savedData) { try { const data = JSON.parse(savedData); if (data.ingredients && data.ingredients['Queijo Prato'] && data.ingredients['Queijo Prato'].unitUse === 'fatias') { data.ingredients['Queijo Prato'].unitUse = 'g'; data.ingredients['Queijo Prato'].defaultQty = 1000; } fixedCosts = data.fixedCosts || JSON.parse(JSON.stringify(initialFixedCosts)); ingredients = data.ingredients || JSON.parse(JSON.stringify(initialIngredients)); recipes = data.recipes || JSON.parse(JSON.stringify(initialRecipes)); packaging = data.packaging || JSON.parse(JSON.stringify(initialPackaging)); Object.keys(recipes).forEach(name => { if (recipes[name].type === 'recipe' && recipes[name].items && recipes[name].items['Queijo Prato'] && ingredients['Queijo Prato'] && ingredients['Queijo Prato'].unitUse === 'g') { if (recipes[name].items['Queijo Prato'] < 10) { recipes[name].items['Queijo Prato'] = 30; } } if (!recipes[name].packaging) recipes[name].packaging = {}; if (!recipes[name].prepTime) recipes[name].prepTime = 0; }); renderAll(); applySavableValues(data); const savedDate = data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'desconhecido'; updateStatus(`✔ Dados carregados do último acesso (${savedDate}).`, 'success'); } catch(e) { resetToDefault(); updateStatus('❌ Erro ao carregar dados. Restaurado para o padrão.', 'error'); } } else { resetToDefault(); } }
-                function resetToDefault() { ingredients = JSON.parse(JSON.stringify(initialIngredients)); recipes = JSON.parse(JSON.stringify(initialRecipes)); fixedCosts = JSON.parse(JSON.stringify(initialFixedCosts)); packaging = JSON.parse(JSON.stringify(initialPackaging)); renderAll(); document.querySelectorAll('.savable').forEach(input => { if(input.id.startsWith('price-')) input.value = ''; }); const markupEl = getEl('markup'); if(markupEl) markupEl.value = '3.5'; const laborCostEl = getEl('labor-cost-per-hour'); if(laborCostEl) laborCostEl.value = '0'; const ifoodTaxEl = getEl('ifood-tax'); if(ifoodTaxEl) ifoodTaxEl.value = '28'; const extraFeeREl = getEl('extra-fee-r'); if(extraFeeREl) extraFeeREl.value = '0'; const extraFeePEl = getEl('extra-fee-p'); if(extraFeePEl) extraFeePEl.value = '0'; calculateAll(); updateStatus('❕ Dados restaurados para o padrão.', 'warning'); }
-                function filterItems() { const searchInput = getEl('search-input'); if (!searchInput) return; const searchTerm = searchInput.value.toLowerCase().trim(); document.querySelectorAll('.item-card').forEach(card => { const itemName = card.dataset.name.toLowerCase(); const recipeData = recipes[card.dataset.name]; let hasIngredient = false; if(recipeData && recipeData.type === 'recipe' && recipeData.items) { hasIngredient = Object.keys(recipeData.items).some(ing => ing.toLowerCase().includes(searchTerm)); } card.style.display = (itemName.includes(searchTerm) || hasIngredient) ? 'block' : 'none'; }); }
-                const darkModeToggle = getEl('dark-mode-toggle'); if (darkModeToggle) { const moonIcon = getEl('moon-icon'); const sunIcon = getEl('sun-icon'); let theme = localStorage.getItem('theme'); if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); document.body.classList.add('dark'); document.body.classList.remove('light'); if(moonIcon) moonIcon.classList.add('hidden'); if(sunIcon) sunIcon.classList.remove('hidden'); } else { document.documentElement.classList.remove('dark'); document.body.classList.add('light'); document.body.classList.remove('dark'); } darkModeToggle.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); document.body.classList.toggle('light'); if(moonIcon) moonIcon.classList.toggle('hidden'); if(sunIcon) sunIcon.classList.toggle('hidden'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }); }
-                loadDataFromLocalStorage(); calculateAll();
-                document.body.addEventListener('change', (e) => { if (e.target.matches('.savable, .fixed-cost-name, .fixed-cost-value, .recipe-name-input')) { saveDataToLocalStorage(); } });
-                document.body.addEventListener('input', calculateAll);
-                const saveBtn = getEl('save-btn'); if(saveBtn) saveBtn.addEventListener('click', () => { saveDataToLocalStorage(); updateStatus('✔ Dados salvos manualmente!', 'success'); });
-                const exportBtn = getEl('export-btn'); if(exportBtn) exportBtn.addEventListener('click', exportData);
-                const importBtn = getEl('import-btn'); if(importBtn) importBtn.addEventListener('click', () => { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.json'; fileInput.onchange = importData; fileInput.click(); });
-                const resetBtn = getEl('reset-btn'); if(resetBtn) resetBtn.addEventListener('click', () => { if (confirm('Tem certeza que deseja resetar TODOS os dados para o padrão inicial?')) { resetToDefault(); saveDataToLocalStorage(); } });
-                const clearIngredientsBtn = getEl('clear-ingredients-btn'); if(clearIngredientsBtn) clearIngredientsBtn.addEventListener('click', () => { if (confirm('Tem certeza que deseja limpar TODOS os ingredientes?')) { const currentSavableValues = getSavableValues(); ingredients = {}; Object.keys(recipes).forEach(name => { if(recipes[name].type === 'recipe') recipes[name].items = {}; }); renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } });
-                const clearRecipesBtn = getEl('clear-recipes-btn'); if(clearRecipesBtn) clearRecipesBtn.addEventListener('click', () => { if (confirm('Tem certeza que deseja limpar TODOS os itens?')) { recipes = {}; renderAll(); saveDataToLocalStorage(); updateStatus('✔ Todos os itens (receitas) foram removidos.', 'success'); } });
-                const clearPkgBtn = getEl('clear-packaging-btn'); if (clearPkgBtn) { clearPkgBtn.addEventListener('click', () => { if (confirm('Tem certeza que deseja limpar TODAS as embalagens? Isso irá removê-las de todos os itens.')) { const currentSavableValues = getSavableValues(); packaging = {}; Object.keys(recipes).forEach(name => { recipes[name].packaging = {}; }); renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); updateStatus('✔ Todas as embalagens foram removidas.', 'success'); } }); }
-                const searchInput = getEl('search-input'); if(searchInput) searchInput.addEventListener('input', filterItems);
-                const togglePkgBaseBtn = getEl('toggle-packaging-base-btn'); if (togglePkgBaseBtn) { togglePkgBaseBtn.addEventListener('click', () => { const container = getEl('packaging-base-container'); const button = getEl('toggle-packaging-base-btn'); if(container && button) { const isHidden = container.style.maxHeight === '0px'; if (isHidden) { container.style.maxHeight = '2000px'; button.textContent = 'Ocultar Embalagens'; } else { container.style.maxHeight = '0px'; button.textContent = 'Mostrar Embalagens'; } } }); }
-                const addPackagingBtn = getEl('add-packaging-btn'); if (addPackagingBtn) { addPackagingBtn.addEventListener('click', () => { const nameEl = getEl('new-packaging-name'); const priceEl = getEl('new-packaging-price'); const qtyEl = getEl('new-packaging-qty'); if(!nameEl || !priceEl || !qtyEl) return; const name = nameEl.value.trim(); const price = parseFloat(priceEl.value); const qty = parseFloat(qtyEl.value); if (!name || price <= 0 || qty <= 0) { updateStatus('❌ Preencha todos os campos da embalagem (preço e qtd) corretamente.', 'error'); return; } if (packaging[name]) { updateStatus('❌ Embalagem já existente na base.', 'error'); return; } const currentSavableValues = getSavableValues(); packaging[name] = { price, qty }; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); nameEl.value = ''; priceEl.value = ''; qtyEl.value = ''; updateStatus(`✔ Embalagem "${name}" adicionada.`, 'success'); }); }
-                const toggleBaseBtn = getEl('toggle-base-btn'); if(toggleBaseBtn) toggleBaseBtn.addEventListener('click', () => { const container = getEl('ingredients-base-container'); const button = getEl('toggle-base-btn'); if(container && button) { const isHidden = container.style.maxHeight === '0px'; if (isHidden) { container.style.maxHeight = '2000px'; button.textContent = 'Ocultar Ingredientes'; } else { container.style.maxHeight = '0px'; button.textContent = 'Mostrar Ingredientes'; } } });
-                const addFixedBtn = getEl('add-fixed-cost-btn'); if (addFixedBtn) { addFixedBtn.addEventListener('click', () => { const currentSavableValues = getSavableValues(); fixedCosts.push({ id: Date.now(), name: '', value: '' }); renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); updateStatus('✔ Custo fixo adicionado (preencha nome/valor).', 'success'); }); }
-                const addIngredientBtn = getEl('add-ingredient-btn'); if (addIngredientBtn) { addIngredientBtn.addEventListener('click', () => { const nameEl = getEl('new-ingredient-name'); const unitBuyEl = getEl('new-ingredient-unitBuy'); const unitUseEl = getEl('new-ingredient-unitUse'); const defaultQtyEl = getEl('new-ingredient-defaultQty'); if(!nameEl || !unitBuyEl || !unitUseEl || !defaultQtyEl) return; const name = nameEl.value.trim(); const unitBuy = unitBuyEl.value.trim(); const unitUse = unitUseEl.value.trim(); const defaultQty = parseFloat(defaultQtyEl.value) || 1; if (!name || !unitBuy || !unitUse) { updateStatus('❌ Preencha todos os campos para o novo ingrediente.', 'error'); return; } if (ingredients[name]) { updateStatus('❌ Ingrediente já existente na base.', 'error'); return; } const currentSavableValues = getSavableValues(); ingredients[name] = { unitBuy, unitUse, defaultQty }; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); nameEl.value = ''; defaultQtyEl.value = ''; unitBuyEl.value = 'Kg'; unitUseEl.value = 'g'; updateStatus(`✔ Ingrediente "${name}" adicionado.`, 'success'); }); }
-                const addRecipeBtn = getEl('add-recipe-btn'); if (addRecipeBtn) { addRecipeBtn.addEventListener('click', () => { const nameEl = getEl('new-recipe-name'); const typeEl = getEl('new-recipe-type'); if(!nameEl || !typeEl) return; const name = (nameEl.value || '').trim(); const type = (typeEl.value || 'recipe'); if (!name) { updateStatus('❌ Digite um nome para o novo item.', 'error'); return; } if (recipes[name]) { updateStatus('❌ Já existe um item com esse nome. Escolha outro nome.', 'error'); return; } const currentSavableValues = getSavableValues(); if (type === 'recipe') recipes[name] = { type: 'recipe', items: {}, packaging: {}, prepTime: 0 }; else recipes[name] = { type: 'single', cost: 0, packaging: {}, prepTime: 0 }; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); nameEl.value = ''; updateStatus(`✔ Item "${name}" criado.`, 'success'); setTimeout(() => { const fichas = getEl('burgers-fichas'); if (fichas && fichas.lastElementChild) { fichas.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' }); } }, 100); }); }
-                document.body.addEventListener('click', e => { if(e.target.matches('.remove-fixed-cost-btn')) { const currentSavableValues = getSavableValues(); const idToRemove = parseInt(e.target.dataset.id); fixedCosts = fixedCosts.filter(cost => cost.id !== idToRemove); renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } if(e.target.matches('.remove-ingredient-base-btn')) { const nameToRemove = e.target.dataset.name; if(confirm(`Tem certeza que deseja remover "${nameToRemove}" da base? Isso irá removê-lo de todas as receitas.`)){ const currentSavableValues = getSavableValues(); delete ingredients[nameToRemove]; Object.keys(recipes).forEach(burger => { if(recipes[burger].items) delete recipes[burger].items[nameToRemove]; }); renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } } if(e.target.matches('.add-recipe-ingredient-btn')) { const burgerName = e.target.dataset.burger; const container = e.target.closest('div'); if(!container) return; const select = container.querySelector('.add-ingredient-select'); const qtyInput = container.querySelector('.add-ingredient-qty'); if(!select || !qtyInput) return; const ingredientName = select.value; const qty = parseFloat(qtyInput.value); if (ingredientName && qty > 0) { const currentSavableValues = getSavableValues(); if (!recipes[burgerName].items) recipes[burgerName].items = {}; recipes[burgerName].items[ingredientName] = qty; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } else { updateStatus('❌ Selecione um ingrediente e defina uma quantidade maior que zero.', 'error'); } } if (e.target.matches('.remove-recipe-ingredient-btn')) { const currentSavableValues = getSavableValues(); const burgerName = e.target.dataset.burger; const ingredientName = e.target.dataset.ingredient; if(recipes[burgerName] && recipes[burgerName].items) delete recipes[burgerName].items[ingredientName]; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } if (e.target.matches('.toggle-recipe-details')) { const card = e.target.closest('.item-card'); if(!card) return; const details = card.querySelector('.recipe-details'); const compactSummary = card.querySelector('.summary-compact'); if(!details || !compactSummary) return; const isHidden = details.style.maxHeight === '0px'; if (isHidden) { details.style.maxHeight = details.scrollHeight + 'px'; e.target.textContent = 'Ocultar'; compactSummary.style.display = 'none'; } else { details.style.maxHeight = '0px'; e.target.textContent = 'Mostrar'; compactSummary.style.display = 'grid'; } } if (e.target.matches('.remove-recipe-card-btn')) { const burgerName = e.target.dataset.burger; if(confirm(`Tem certeza que deseja excluir o item "${burgerName}"? Esta ação não pode ser desfeita.`)) { const currentSavableValues = getSavableValues(); delete recipes[burgerName]; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } } if(e.target.matches('.remove-packaging-base-btn')) { const nameToRemove = e.target.dataset.name; if(confirm(`Tem certeza que deseja remover "${nameToRemove}" da base de embalagens? Isso irá removê-lo de todos os itens.`)){ const currentSavableValues = getSavableValues(); delete packaging[nameToRemove]; Object.keys(recipes).forEach(burger => { if(recipes[burger].packaging) delete recipes[burger].packaging[nameToRemove]; }); renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } } if(e.target.matches('.add-recipe-packaging-btn')) { const itemName = e.target.dataset.burger; const container = e.target.closest('div'); if(!container) return; const select = container.querySelector('.add-packaging-select'); const qtyInput = container.querySelector('.add-packaging-qty'); if(!select || !qtyInput) return; const pkgName = select.value; const qty = parseFloat(qtyInput.value) || 1; if (pkgName) { const currentSavableValues = getSavableValues(); if (!recipes[itemName].packaging) recipes[itemName].packaging = {}; recipes[itemName].packaging[pkgName] = qty; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } else { updateStatus('❌ Selecione uma embalagem.', 'error'); } } if (e.target.matches('.remove-recipe-packaging-btn')) { const currentSavableValues = getSavableValues(); const itemName = e.target.dataset.burger; const pkgName = e.target.dataset.packaging; if(recipes[itemName] && recipes[itemName].packaging) delete recipes[itemName].packaging[pkgName]; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } });
-                document.body.addEventListener('change', e => { if (e.target.matches('.recipe-name-input')) { const input = e.target; const newName = input.value.trim(); const oldName = input.dataset.originalName; if (newName === oldName || !newName) { input.value = oldName; return; } if (recipes[newName]) { updateStatus('❌ Já existe um item com esse nome.', 'error'); input.value = oldName; return; } const descriptor = Object.getOwnPropertyDescriptor(recipes, oldName); if (descriptor) { const currentSavableValues = getSavableValues(); Object.defineProperty(recipes, newName, descriptor); delete recipes[oldName]; input.dataset.originalName = newName; renderAll(); applySavableValues(currentSavableValues); calculateAll(); saveDataToLocalStorage(); } else { console.warn(`Property to rename not found: ${oldName}`); input.value = oldName; } } });
-                const toggleAllCardsBtn = getEl('toggle-all-cards-btn'); if(toggleAllCardsBtn) toggleAllCardsBtn.addEventListener('click', () => { const hidden = toggleAllCardsBtn.dataset.hidden === 'true'; const newHidden = !hidden; document.querySelectorAll('.item-card').forEach(card => { const details = card.querySelector('.recipe-details'); const compactSummary = card.querySelector('.summary-compact'); const toggleBtn = card.querySelector('.toggle-recipe-details'); if(details && compactSummary && toggleBtn) { if (newHidden) { details.style.maxHeight = '0px'; toggleBtn.textContent = 'Mostrar'; compactSummary.style.display = 'grid'; } else { details.style.maxHeight = details.scrollHeight + 'px'; toggleBtn.textContent = 'Ocultar'; compactSummary.style.display = 'none'; } } }); toggleAllCardsBtn.dataset.hidden = newHidden ? 'true' : 'false'; toggleAllCardsBtn.textContent = newHidden ? 'Mostrar Todos' : 'Ocultar Todos'; });
+    // Event listeners Netlify Identity
+    netlifyIdentity.on('login', () => {
+      netlifyIdentity.close();
+      refreshUI();
+    });
+    netlifyIdentity.on('logout', () => {
+      refreshUI();
+    });
+
+    // Login / Logout buttons
+    btnLogin.addEventListener('click', () => netlifyIdentity.open());
+    btnLogout.addEventListener('click', () => netlifyIdentity.logout());
+
+    // Inicializa a UI ao carregar
+    refreshUI();
+
+    // --- Calculadora simples ---
+    document.getElementById('calcBtn').addEventListener('click', () => {
+      const cost = parseFloat(document.getElementById('cost').value) || 0;
+      const markup = parseFloat(document.getElementById('markup').value) || 0;
+      const qty = parseInt(document.getElementById('quantity').value) || 0;
+      const price = cost + (cost * (markup / 100));
+      const revenue = price * qty;
+      const profit = (price - cost) * qty;
+      document.getElementById('result').innerHTML = `
+        Preço sugerido: R$ ${price.toFixed(2)} <br>
+        Receita mensal: R$ ${revenue.toFixed(2)} <br>
+        Lucro mensal estimado: R$ ${profit.toFixed(2)}
+      `;
+    });
+
+    // --- Checkout (consome sua função Netlify create-checkout-session) ---
+    // Seleciona todos os botões com classe subscribeBtn
+    const subscribeButtons = Array.from(document.querySelectorAll('.subscribeBtn'));
+
+    // Função utilitária de sleep
+    const wait = ms => new Promise(res => setTimeout(res, ms));
+
+    subscribeButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        paymentStatus.textContent = '';
+        const priceId = e.currentTarget.dataset.priceId;
+        const mode = e.currentTarget.dataset.mode;
+
+        if (!priceId || !mode) {
+          paymentStatus.textContent = 'Erro interno: priceId ou mode ausente.';
+          return;
+        }
+
+        paymentStatus.textContent = 'A gerar link de pagamento...';
+
+        try {
+          // garantir que o usuário está logado (precisa do userId)
+          let user = getCurrentUser();
+
+          if (!user) {
+            // abre modal de login, espera até que o usuário faça login (ou timeout)
+            netlifyIdentity.open();
+            // aguardar login com timeout simples (20s)
+            let waited = 0;
+            while (!user && waited < 20000) {
+              await wait(500);
+              waited += 500;
+              user = getCurrentUser();
             }
-        });
-    </script>
+          }
+
+          if (!user) {
+            paymentStatus.textContent = 'Você precisa estar logado para assinar.';
+            return;
+          }
+
+          const userId = user.id || user.sub || (user.user_metadata && user.user_metadata.id);
+          if (!userId) {
+            paymentStatus.textContent = 'ID do usuário não encontrado. Tente relogar.';
+            return;
+          }
+
+          // Faz a requisição à função - envia JSON e espera redirect_url
+          const response = await fetch('/.netlify/functions/create-checkout-session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ priceId, mode, userId })
+          });
+
+          // Lê JSON uma única vez
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            const errMsg = (data && data.error) ? data.error : `Erro ${response.status}`;
+            paymentStatus.textContent = `Erro ao criar sessão: ${errMsg}`;
+            console.error('create-checkout-session erro:', response.status, data);
+            return;
+          }
+
+          if (!data.redirect_url) {
+            paymentStatus.textContent = 'Resposta inválida do servidor, sem redirect_url.';
+            console.error('Resposta sem redirect_url:', data);
+            return;
+          }
+
+          // Redireciona para o Stripe Checkout
+          paymentStatus.textContent = 'Redirecionando para o pagamento...';
+          window.location.href = data.redirect_url;
+
+        } catch (err) {
+          console.error('Erro no checkout:', err);
+          paymentStatus.textContent = `Erro: ${err && err.message ? err.message : err}`;
+        }
+      });
+    });
+
+    // Atualiza a UI caso o usuário já esteja logado quando a página carrega
+    // (em situações de SPA, netlifyIdentity.currentUser() pode surgir depois)
+    setTimeout(refreshUI, 800);
+
+  </script>
 </body>
 </html>
-
