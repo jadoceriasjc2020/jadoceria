@@ -1,6 +1,6 @@
 {
-  "name": "jadoceria-netlify-functions",
-  "version": "1.0.0",
+  "name": "jadoceria-netlify-functions-v2",
+  "version": "1.0.1",
   "description": "Dependências para as funções Netlify do projeto Jadoceria",
   "dependencies": {
     "stripe": "^16.2.0",
