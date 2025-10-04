@@ -1,102 +1,115 @@
+// Importações necessárias
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
 
-// Função para gerar um token de administrador para o serviço Netlify Identity
-const generateAdminToken = () => {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('A variável de ambiente JWT_SECRET não está definida. É essencial para a autenticação.');
-  }
-  // Este token dá à nossa função o poder de "admin" sobre os usuários do Identity
-  const payload = {
-    exp: Math.floor(Date.now() / 1000) + (60), // Expira em 60 segundos
-    iat: Math.floor(Date.now() / 1000),
-    server_role: 'admin', // A "magia" está aqui
-  };
-  return jwt.sign(payload, secret);
-};
+// --- Início da Função Handler ---
+exports.handler = async ({ body, headers }) => {
+  // LOG 1: Confirma que a versão mais recente da função foi executada.
+  // Se esta mensagem não aparecer nos logs, o deploy não funcionou.
+  console.log('--- EXECUTANDO WEBHOOK vFINAL (com JWT e Logs Detalhados) ---');
 
-// Função para atualizar o papel (role) do utilizador na Netlify
-const updateUserRole = async (userId) => {
   try {
-    const adminToken = generateAdminToken();
+    // --- VERIFICAÇÃO DAS VARIÁVEIS DE AMBIENTE ---
     const siteUrl = process.env.SITE_URL;
+    const jwtSecret = process.env.JWT_SECRET;
+    const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    if (!siteUrl) {
-      throw new Error('A variável de ambiente SITE_URL não está definida.');
-    }
-
-    // ESTA É A MUDANÇA CRUCIAL:
-    // Estamos a comunicar diretamente com a API de administração do Identity
-    // do SEU site, em vez da API pública geral da Netlify.
-    // É o caminho mais direto e fiável.
-    const url = `${siteUrl}/.netlify/identity/admin/users/${userId}`;
-
-    console.log(`--- A TENTAR ATUALIZAR O UTILIZADOR: ${userId} ---`);
-    console.log(`URL do Admin Identity: ${url}`);
-
-    const body = {
-      app_metadata: {
-        roles: ['premium'],
-      },
-    };
-
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${adminToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Resposta de erro da API do Netlify Identity Admin:', errorData);
-      throw new Error(`Falha ao atualizar o utilizador: Status ${response.status} - ${errorData}`);
+    if (!siteUrl || !jwtSecret || !stripeWebhookSecret) {
+      console.error('ERRO CRÍTICO DE CONFIGURAÇÃO: Uma ou mais variáveis de ambiente estão em falta.');
+      console.error(`SITE_URL existe? ${!!siteUrl}`);
+      console.error(`JWT_SECRET existe? ${!!jwtSecret}`);
+      console.error(`STRIPE_WEBHOOK_SECRET existe? ${!!stripeWebhookSecret}`);
+      return { statusCode: 500, body: 'Erro de configuração do servidor.' };
     }
     
-    const responseData = await response.json();
-    console.log('Utilizador atualizado com sucesso!', responseData);
-    return responseData;
+    // LOG 2: Confirma que as variáveis de ambiente foram lidas.
+    console.log('Variáveis de ambiente carregadas com sucesso.');
 
-  } catch (error) {
-    console.error("Erro dentro da função updateUserRole:", error.message);
-    // Propaga o erro para ser apanhado pelo handler principal
-    throw error;
-  }
-};
-
-exports.handler = async ({ body, headers }) => {
-  try {
+    // --- VALIDAÇÃO DO EVENTO STRIPE ---
     const stripeEvent = stripe.webhooks.constructEvent(
       body,
       headers['stripe-signature'],
-      process.env.STRIPE_WEBHOOK_SECRET
+      stripeWebhookSecret
     );
+    
+    // LOG 3: Confirma que o evento do Stripe é válido.
+    console.log(`Evento Stripe validado com sucesso: ${stripeEvent.type}`);
 
+    // --- PROCESSAMENTO DO EVENTO ---
     if (stripeEvent.type === 'checkout.session.completed') {
       const session = stripeEvent.data.object;
       const netlifyUserId = session.client_reference_id;
-      
-      if (netlifyUserId) {
-        console.log(`Evento 'checkout.session.completed' recebido para o utilizador: ${netlifyUserId}`);
-        await updateUserRole(netlifyUserId);
-        console.log(`SUCESSO FINAL: Acesso premium concedido ao utilizador: ${netlifyUserId}`);
-      } else {
-        console.error('ERRO CRÍTICO: checkout.session.completed recebido sem client_reference_id.');
-        // Retornar 400 para que o Stripe saiba que algo está errado com este evento específico
-        return { statusCode: 400, body: 'Webhook Error: client_reference_id em falta no evento do Stripe.' };
+
+      if (!netlifyUserId) {
+        console.error('ERRO: Evento "checkout.session.completed" recebido sem client_reference_id.');
+        return { statusCode: 400, body: 'Webhook Error: client_reference_id em falta.' };
       }
+
+      // LOG 4: Temos o ID do utilizador.
+      console.log(`Utilizador a ser atualizado: ${netlifyUserId}`);
+
+      // --- GERAÇÃO DO TOKEN DE ADMIN ---
+      let adminToken;
+      try {
+        const payload = {
+          exp: Math.floor(Date.now() / 1000) + 60, // Expira em 60 segundos
+          iat: Math.floor(Date.now() / 1000),
+          server_role: 'admin',
+        };
+        adminToken = jwt.sign(payload, jwtSecret);
+        // LOG 5: Token de admin gerado.
+        console.log('Token de admin JWT gerado com sucesso.');
+      } catch (jwtError) {
+        console.error('ERRO GRAVE ao gerar o token JWT:', jwtError.message);
+        throw new Error('Falha na geração do token de autenticação do admin.');
+      }
+
+      // --- CHAMADA À API DO NETLIFY IDENTITY ADMIN ---
+      const url = `${siteUrl}/.netlify/identity/admin/users/${netlifyUserId}`;
+      const userData = {
+        app_metadata: {
+          roles: ['premium'],
+        },
+      };
+
+      // LOG 6: Preparando para chamar a API final.
+      console.log(`A enviar pedido PUT para: ${url}`);
+      
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      // --- ANÁLISE DA RESPOSTA ---
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`ERRO da API do Netlify Identity Admin (Status: ${response.status}):`, errorBody);
+        // Lança um erro para ser apanhado pelo catch principal e retornar um 400 para o Stripe.
+        throw new Error(`A API do Identity respondeu com status ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      
+      // LOG 7: SUCESSO!
+      console.log('SUCESSO! Utilizador atualizado na Netlify.', responseData);
+    
+    } else {
+      console.log(`Evento do tipo "${stripeEvent.type}" recebido, nenhuma ação necessária.`);
     }
 
     return {
       statusCode: 200,
       body: JSON.stringify({ received: true }),
     };
+
   } catch (err) {
-    console.error(`Webhook do Stripe falhou de forma geral: ${err.message}`);
+    // LOG DE ERRO GERAL
+    console.error(`FALHA GERAL NO WEBHOOK: ${err.message}`);
     return {
       statusCode: 400,
       body: `Webhook Error: ${err.message}`,
