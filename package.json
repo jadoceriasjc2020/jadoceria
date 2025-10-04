@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Dependências para as funções Netlify do projeto Jadoceria",
   "dependencies": {
-    "@serverless-jwt/netlify": "^0.2.0",
-    "stripe": "^16.2.0"
+    "stripe": "^16.2.0",
+    "node-fetch": "^2.7.0"
   }
 }
