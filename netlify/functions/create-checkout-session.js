@@ -2,38 +2,76 @@
 const Stripe = require('stripe');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-exports.handler = async (event) => {
+const parseJsonSafe = (str) => {
+  try { return JSON.parse(str || '{}'); } catch (e) { return {}; }
+};
+
+exports.handler = async (event, context) => {
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { priceId, userId, userEmail } = body;
-
-    if (!priceId) {
-      return { statusCode: 400, body: 'priceId is required' };
+    // 1) obter dados do body de forma segura
+    const contentType = (event.headers['content-type'] || event.headers['Content-Type'] || '').toLowerCase();
+    let body = {};
+    if (contentType.includes('application/json')) {
+      body = parseJsonSafe(event.body);
+    } else {
+      // fallback: tentar parse anyway
+      body = parseJsonSafe(event.body);
     }
+
+    const priceId = body.priceId || null;
+    const mode = body.mode || 'subscription';
+
+    // 2) identificar userId: preferir o que foi enviado no body; senão usar context (Netlify)
+    const userIdFromBody = body.userId || body.user_id || body.client_reference_id;
+    const ctxUser = (context && context.clientContext && context.clientContext.user) || null;
+    const userIdFromContext = ctxUser && (ctxUser.sub || ctxUser.id || ctxUser.user_id);
+    const userId = userIdFromBody || userIdFromContext;
+
+    // 3) validações e respostas consistentes em JSON
     if (!userId) {
-      return { statusCode: 400, body: 'userId is required' };
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'userId is required' }),
+      };
+    }
+    if (!priceId) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'priceId is required' }),
+      };
+    }
+    if (!process.env.SITE_URL) {
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'SITE_URL not configured' }),
+      };
     }
 
-    const siteUrl = (process.env.SITE_URL || '').replace(/\/$/, '');
-    if (!siteUrl) return { statusCode: 500, body: 'SITE_URL not configured' };
-
+    // 4) criar sessão no Stripe
     const session = await stripe.checkout.sessions.create({
-      mode: 'subscription', // ou 'payment' se não for assinatura recorrente
+      mode: mode === 'payment' ? 'payment' : 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      client_reference_id: userId, // **CRUCIAL** para linkar o usuário Netlify ao Stripe
-      customer_email: userEmail || undefined,
-      success_url: `${siteUrl}/?checkout=success`,
-      cancel_url: `${siteUrl}/?checkout=cancel`,
+      client_reference_id: userId,
+      success_url: `${process.env.SITE_URL}/?checkout=success`,
+      cancel_url: `${process.env.SITE_URL}/?checkout=cancel`,
     });
 
+    // 5) responder SEM redirect 303 — devolver JSON com a url para o frontend redirecionar
     return {
-      statusCode: 303,
-      headers: { Location: session.url },
-      body: '',
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ redirect_url: session.url }),
     };
   } catch (err) {
-    console.error('create-checkout-session error', err);
-    return { statusCode: 500, body: `Internal error: ${err.message}` };
+    console.error('create-checkout-session error:', err && err.stack ? err.stack : err);
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: `Internal error: ${err.message || err}` }),
+    };
   }
 };
