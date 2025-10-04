@@ -2,11 +2,55 @@
 const fetch = require('node-fetch');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Função para dormir por um período de tempo
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Função que tenta atualizar o utilizador com retentativas
+const updateUserWithRetry = async (userId, token, maxRetries = 3, delay = 3000) => {
+  const siteId = process.env.NETLIFY_SITE_ID;
+  if (!siteId) {
+      throw new Error("ERRO CRÍTICO: NETLIFY_SITE_ID não está configurado.");
+  }
+
+  // A URL que faz mais sentido lógico: específica para o site.
+  const url = `https://api.netlify.com/api/v1/sites/${siteId}/users/${userId}`;
+  const userData = { app_metadata: { roles: ['premium'] } };
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`--- Tentativa ${attempt} de ${maxRetries} ---`);
+    console.log(`A enviar pedido PUT para: ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (response.ok) {
+      console.log('SUCESSO! Utilizador atualizado.');
+      return await response.json(); // Sucesso, retorna a resposta
+    }
+
+    // Se for 404 e ainda tivermos tentativas, espera e tenta de novo
+    if (response.status === 404 && attempt < maxRetries) {
+      console.warn(`API retornou 404 (Not Found). O utilizador pode ainda não ter propagado. A aguardar ${delay / 1000}s...`);
+      await sleep(delay);
+    } else {
+      // Se for outro erro ou a última tentativa, falha de vez
+      const errorBody = await response.text();
+      console.error(`ERRO da API da Netlify (Status: ${response.status}):`, errorBody);
+      throw new Error(`A API da Netlify respondeu com status ${response.status}`);
+    }
+  }
+};
+
 exports.handler = async ({ body, headers }) => {
-  console.log('--- EXECUTANDO WEBHOOK vFINAL (para Identity Deprecated com Atraso) ---');
+  console.log('--- EXECUTANDO WEBHOOK vFINAL (com Retentativa Inteligente) ---');
 
   try {
-    // 1. Validar o evento do Stripe
     const stripeEvent = stripe.webhooks.constructEvent(
       body,
       headers['stripe-signature'],
@@ -19,52 +63,17 @@ exports.handler = async ({ body, headers }) => {
       const netlifyUserId = session.client_reference_id;
 
       if (!netlifyUserId) {
-        console.error('ERRO: client_reference_id não encontrado na sessão do Stripe.');
-        return { statusCode: 400, body: 'Webhook Error: client_reference_id em falta.' };
+        throw new Error('client_reference_id não encontrado na sessão do Stripe.');
       }
       console.log(`Utilizador a ser atualizado: ${netlifyUserId}`);
 
-      // 2. Montar a requisição para a API correta
       const adminToken = process.env.NETLIFY_ADMIN_AUTH_TOKEN;
       if (!adminToken) {
-        console.error('ERRO CRÍTICO: NETLIFY_ADMIN_AUTH_TOKEN não está configurado.');
-        return { statusCode: 500, body: 'Erro de configuração do servidor.' };
+        throw new Error('NETLIFY_ADMIN_AUTH_TOKEN não está configurado.');
       }
       
-      // A URL correta para a versão antiga do Identity!
-      const url = `https://api.netlify.com/api/v1/users/${netlifyUserId}`;
-      
-      const userData = {
-        app_metadata: {
-          roles: ['premium'],
-        },
-      };
-
-      // --- O ATRASO ESTRATÉGICO ---
-      console.log('Aguardando 5 segundos para permitir a propagação do utilizador na Netlify...');
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      console.log('Aguardamento concluído. A tentar a atualização...');
-      
-      console.log(`A enviar pedido PUT para a API principal: ${url}`);
-      
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      // 3. Analisar a resposta
-      if (!response.ok) {
-        const errorBody = await response.text();
-        console.error(`ERRO da API da Netlify (Status: ${response.status}):`, errorBody);
-        throw new Error(`A API da Netlify respondeu com status ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log('SUCESSO! Utilizador atualizado via API principal.', responseData);
+      // Chama a nossa nova função com lógica de retentativa
+      await updateUserWithRetry(netlifyUserId, adminToken);
     }
 
     return {
