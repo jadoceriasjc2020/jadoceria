@@ -1,3 +1,4 @@
+// FORÇANDO NOVO DEPLOY v1.0.1 - Esta linha é para criar um novo commit.
 // Importações necessárias
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const jwt = require('jsonwebtoken');
