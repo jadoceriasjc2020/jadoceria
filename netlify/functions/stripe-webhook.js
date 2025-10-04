@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async ({ body, headers }) => {
-  console.log('--- EXECUTANDO WEBHOOK vFINAL (para Identity Deprecated) ---');
+  console.log('--- EXECUTANDO WEBHOOK vFINAL (para Identity Deprecated com Atraso) ---');
 
   try {
     // 1. Validar o evento do Stripe
@@ -40,6 +40,11 @@ exports.handler = async ({ body, headers }) => {
         },
       };
 
+      // --- O ATRASO ESTRATÉGICO ---
+      console.log('Aguardando 5 segundos para permitir a propagação do utilizador na Netlify...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      console.log('Aguardamento concluído. A tentar a atualização...');
+      
       console.log(`A enviar pedido PUT para a API principal: ${url}`);
       
       const response = await fetch(url, {
